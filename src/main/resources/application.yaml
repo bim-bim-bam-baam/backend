@@ -1,3 +1,15 @@
 spring:
   application:
     name: hack-template
+  datasource:
+    url: jdbc:postgres://localhost:5432/db
+    username: db
+    password: db
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret: asdjkfkasdjfkl;asdjfds;kajf;laksdjf;kldsajfklajsdfkl;jasdk;lf;jasdlkfjlasdk;jf;klasdjf;lasdjfkl;asdjfkljgkjhjhbviufdsfgjdfjgjkdfshghfjdsgk
+  expiration: 3600000 # 1 hour in milliseconds
+
