@@ -22,4 +22,7 @@ public class User {
 
     @Column(name = "avatar")
     private String avatar;
+
+    @Column(name = "roles")
+    private String roles;
 }

@@ -1,9 +1,9 @@
 package org.bimbimbambam.hacktemplate.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.bimbimbambam.hacktemplate.controller.request.UserLoginReq;
-import org.bimbimbambam.hacktemplate.controller.request.UserRegisterReq;
-import org.bimbimbambam.hacktemplate.service.UserService;
+import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
+import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
+import org.bimbimbambam.hacktemplate.service.impl.UserServiceImpl;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +12,9 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 public class UserController {
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRegisterReq userRegisterReq) {

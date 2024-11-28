@@ -13,3 +13,9 @@ jwt:
   secret: asdjkfkasdjfkl;asdjfds;kajf;laksdjf;kldsajfklajsdfkl;jasdk;lf;jasdlkfjlasdk;jf;klasdjf;lasdjfkl;asdjfkljgkjhjhbviufdsfgjdfjgjkdfshghfjdsgk
   expiration: 3600000 # 1 hour in milliseconds
 
+minio:
+  bucket: dbdb
+  access-key: kUDhb98j5XgnvSfE69JN
+  secret-key: HTS5b2XaPmMyBodQUuph1DfuEtcE6PmJv2DK0in0
+  url: http://localhost:9000
+

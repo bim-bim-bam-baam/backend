@@ -1,0 +1,77 @@
+package org.bimbimbambam.hacktemplate.service.impl;
+
+import io.minio.*;
+import io.minio.http.Method;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.bimbimbambam.hacktemplate.controller.request.image.ImageRequest;
+import org.bimbimbambam.hacktemplate.service.ImageService;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.bimbimbambam.hacktemplate.config.MinioProperties;
+
+import java.io.InputStream;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+@RequiredArgsConstructor
+@Service
+public class ImageServiceImpl implements ImageService {
+    private final MinioClient minioClient;
+    private final MinioProperties minioProperties;
+
+    @SneakyThrows
+    public String upload(ImageRequest imageRequest) {
+        createBucket();
+
+        MultipartFile file = imageRequest.image();
+
+        String fileName = generateFileName(file);
+
+        try (InputStream inputStream = file.getInputStream();) {
+            saveImage(inputStream, fileName);
+        }
+        return fileName;
+    }
+
+    @SneakyThrows
+    public String getImage(String filename) {
+        return minioClient.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                        .bucket(minioProperties.getBucket())
+                        .method(Method.GET)
+                        .object(filename)
+                        .expiry(1, TimeUnit.MINUTES)
+                        .build()
+        );
+    }
+
+    private String generateFileName(MultipartFile file) {
+        String extension = getExtension(file);
+        return UUID.randomUUID() + "." + extension;
+    }
+
+    private String getExtension(MultipartFile file) {
+        return Objects.requireNonNull(file.getOriginalFilename())
+                .substring(file.getOriginalFilename().lastIndexOf(".") + 1);
+    }
+
+    @SneakyThrows
+    private void createBucket() {
+        boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(minioProperties.getBucket()).build());
+
+        if (!found) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(minioProperties.getBucket()).build());
+        }
+    }
+
+    @SneakyThrows
+    private void saveImage(InputStream inputStream, String fileName) {
+        minioClient.putObject(PutObjectArgs.builder()
+                .stream(inputStream, inputStream.available(), -1)
+                .bucket(minioProperties.getBucket())
+                .object(fileName)
+                .build());
+    }
+}
