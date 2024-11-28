@@ -2,11 +2,13 @@ package org.bimbimbambam.hacktemplate.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.bimbimbambam.hacktemplate.config.MinioConfig;
+import org.bimbimbambam.hacktemplate.controller.request.image.ImageRequest;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserUpdateAvatarReq;
 import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.repository.UserRepository;
+import org.bimbimbambam.hacktemplate.service.ImageService;
 import org.bimbimbambam.hacktemplate.service.UserService;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ImageService imageService;
     private final JwtUtils jwtUtils;
     private final MinioConfig minioConfig;
 
@@ -51,7 +54,8 @@ public class UserServiceImpl implements UserService {
     public void updateAvatar(Long id, UserUpdateAvatarReq updateAvatarReq) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
-            user.get().setAvatar(updateAvatarReq.filename());
+            String filename = imageService.upload(new ImageRequest(updateAvatarReq.image()));
+            user.get().setAvatar(filename);
             userRepository.save(user.get());
         }
     }

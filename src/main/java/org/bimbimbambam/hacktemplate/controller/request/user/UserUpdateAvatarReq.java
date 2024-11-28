@@ -1,5 +1,6 @@
 package org.bimbimbambam.hacktemplate.controller.request.user;
 
-public record UserUpdateAvatarReq(String filename) {
+import org.springframework.web.multipart.MultipartFile;
 
+public record UserUpdateAvatarReq(MultipartFile image) {
 }

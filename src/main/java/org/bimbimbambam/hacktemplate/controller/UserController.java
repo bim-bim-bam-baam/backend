@@ -11,6 +11,7 @@ import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -44,10 +45,10 @@ public class UserController {
         return ResponseEntity.status(401).body("Invalid username or password");
     }
 
-    @PostMapping("/updateAvatar")
+    @PostMapping(value = "/updateAvatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> updateAvatar(
-            @RequestBody UserUpdateAvatarReq userUpdateAvatarReq) {
+            @ModelAttribute UserUpdateAvatarReq userUpdateAvatarReq) {
         Jwt token;
         try {
             token = getJwtToken();
