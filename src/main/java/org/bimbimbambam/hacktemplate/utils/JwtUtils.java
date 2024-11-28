@@ -51,11 +51,24 @@ public class JwtUtils {
                 .get("roles");
     }
 
-    public String extractId(Jwt token) {
-        return (String) Jwts.parser()
+    public Long extractId(Jwt token) {
+        return (Long) Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token.token())
                 .getBody()
                 .get("id");
+    }
+
+    public boolean hasAdminRole(Jwt token) {
+        String roles = extractRoles(token);
+        if (roles != null) {
+            String[] roleArray = roles.split(",");
+            for (String role : roleArray) {
+                if (role.trim().equalsIgnoreCase("admin")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

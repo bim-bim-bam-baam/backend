@@ -3,6 +3,7 @@ package org.bimbimbambam.hacktemplate.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
+import org.bimbimbambam.hacktemplate.controller.request.user.UserUpdateAvatarReq;
 import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.repository.UserRepository;
 import org.bimbimbambam.hacktemplate.service.UserService;
@@ -42,5 +43,19 @@ public class UserServiceImpl implements UserService {
             return Optional.of(token);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public void updateAvatar(Long id, UserUpdateAvatarReq updateAvatarReq) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            user.get().setAvatar(updateAvatarReq.filename());
+            userRepository.save(user.get());
+        }
+    }
+
+    @Override
+    public Optional<User> getUser(Long id) {
+        return userRepository.findById(id);
     }
 }
