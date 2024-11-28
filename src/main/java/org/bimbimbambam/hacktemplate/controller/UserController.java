@@ -1,10 +1,12 @@
 package org.bimbimbambam.hacktemplate.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.bimbimbambam.hacktemplate.controller.request.image.ImageRequest;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
 import org.bimbimbambam.hacktemplate.service.impl.UserServiceImpl;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +34,14 @@ public class UserController {
         if (jwt.isPresent()) {
             return ResponseEntity.ok(jwt.get());
         }
+        return ResponseEntity.status(401).body("Invalid username or password");
+    }
+
+    @PostMapping(path = "/updataAvatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateAvatar(@ModelAttribute ImageRequest imageRequest) {
+
+
+
         return ResponseEntity.status(401).body("Invalid username or password");
     }
 }

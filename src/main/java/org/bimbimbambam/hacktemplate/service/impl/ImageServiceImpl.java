@@ -4,11 +4,11 @@ import io.minio.*;
 import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.bimbimbambam.hacktemplate.config.MinioConfig;
 import org.bimbimbambam.hacktemplate.controller.request.image.ImageRequest;
 import org.bimbimbambam.hacktemplate.service.ImageService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.bimbimbambam.hacktemplate.config.MinioProperties;
 
 import java.io.InputStream;
 import java.util.Objects;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ImageServiceImpl implements ImageService {
     private final MinioClient minioClient;
-    private final MinioProperties minioProperties;
+    private final MinioConfig minioConfig;
 
     @SneakyThrows
     public String upload(ImageRequest imageRequest) {
@@ -39,7 +39,7 @@ public class ImageServiceImpl implements ImageService {
     public String getImage(String filename) {
         return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
-                        .bucket(minioProperties.getBucket())
+                        .bucket(minioConfig.getBucket())
                         .method(Method.GET)
                         .object(filename)
                         .expiry(1, TimeUnit.MINUTES)
@@ -59,10 +59,10 @@ public class ImageServiceImpl implements ImageService {
 
     @SneakyThrows
     private void createBucket() {
-        boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(minioProperties.getBucket()).build());
+        boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(minioConfig.getBucket()).build());
 
         if (!found) {
-            minioClient.makeBucket(MakeBucketArgs.builder().bucket(minioProperties.getBucket()).build());
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(minioConfig.getBucket()).build());
         }
     }
 
@@ -70,7 +70,7 @@ public class ImageServiceImpl implements ImageService {
     private void saveImage(InputStream inputStream, String fileName) {
         minioClient.putObject(PutObjectArgs.builder()
                 .stream(inputStream, inputStream.available(), -1)
-                .bucket(minioProperties.getBucket())
+                .bucket(minioConfig.getBucket())
                 .object(fileName)
                 .build());
     }

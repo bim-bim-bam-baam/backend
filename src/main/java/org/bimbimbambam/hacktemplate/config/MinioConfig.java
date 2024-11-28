@@ -1,22 +1,26 @@
 package org.bimbimbambam.hacktemplate.config;
 
 import io.minio.MinioClient;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@Data
+@ConfigurationProperties(prefix = "minio")
 @Configuration
-@RequiredArgsConstructor
 public class MinioConfig {
-    private final MinioProperties minioProperties;
+
+    private String bucket;
+    private String url;
+    private String accessKey;
+    private String secretKey;
 
     @Bean
     public MinioClient minioClient() {
-        System.out.println("!!!!!!!!!!!!");
-        System.out.println(minioProperties.getUrl());
         return MinioClient.builder()
-                .endpoint(minioProperties.getUrl())
-                .credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey()).build();
+                .endpoint(url)
+                .credentials(accessKey, secretKey).build();
     }
 }
 

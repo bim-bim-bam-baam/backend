@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     public Optional<Jwt> loginUser(UserLoginReq userLoginReq) {
         Optional<User> user = userRepository.findByUsername(userLoginReq.username());
         if (user.isPresent() && passwordEncoder.matches(userLoginReq.password(), user.get().getPassword())) {
-            Jwt token = jwtUtils.generateToken(user.get().getUsername());
+            Jwt token = jwtUtils.generateToken(user.get().getUsername(), user.get().getId(), user.get().getRoles());
             return Optional.of(token);
         }
         return Optional.empty();

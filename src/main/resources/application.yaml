@@ -10,8 +10,8 @@ spring:
       ddl-auto: update
 
 jwt:
-  secret: asdjkfkasdjfkl;asdjfds;kajf;laksdjf;kldsajfklajsdfkl;jasdk;lf;jasdlkfjlasdk;jf;klasdjf;lasdjfkl;asdjfkljgkjhjhbviufdsfgjdfjgjkdfshghfjdsgk
-  expiration: 3600000 # 1 hour in milliseconds
+  secretKey: asdjkfkasdjfkl;asdjfds;kajf;laksdjf;kldsajfklajsdfkl;jasdk;lf;jasdlkfjlasdk;jf;klasdjf;lasdjfkl;asdjfkljgkjhjhbviufdsfgjdfjgjkdfshghfjdsgk
+  expirationTime: 3600000 # 1 hour in milliseconds
 
 minio:
   bucket: dbdb

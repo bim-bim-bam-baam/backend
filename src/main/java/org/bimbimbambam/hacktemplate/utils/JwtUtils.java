@@ -2,22 +2,24 @@ package org.bimbimbambam.hacktemplate.utils;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Data
+@ConfigurationProperties(prefix = "jwt")
 @Component
 public class JwtUtils {
-    @Value("${jwt.secret}")
     private String secretKey;
+    private Long expirationTime;
 
-    @Value("${jwt.expiration}")
-    private long expirationTime;
-
-    public Jwt generateToken(String username) {
+    public Jwt generateToken(String username, Long id, String roles) {
         return new Jwt(Jwts.builder()
                 .setSubject(username)
+                .claim("id", id)
+                .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(SignatureAlgorithm.HS512, secretKey)
@@ -39,5 +41,21 @@ public class JwtUtils {
                 .parseClaimsJws(token.token())
                 .getBody()
                 .getSubject();
+    }
+
+    public String extractRoles(Jwt token) {
+        return (String) Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token.token())
+                .getBody()
+                .get("roles");
+    }
+
+    public String extractId(Jwt token) {
+        return (String) Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token.token())
+                .getBody()
+                .get("id");
     }
 }
