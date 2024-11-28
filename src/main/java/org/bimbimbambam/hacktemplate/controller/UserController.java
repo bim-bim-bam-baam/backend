@@ -1,5 +1,6 @@
 package org.bimbimbambam.hacktemplate.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Optional;
 
@@ -42,18 +45,14 @@ public class UserController {
     }
 
     @PostMapping("/updateAvatar")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> updateAvatar(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @RequestBody UserUpdateAvatarReq userUpdateAvatarReq) {
-
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid Authorization header");
-        }
-
-        Jwt token = new Jwt(authorizationHeader.substring(7));
-
-        if (!jwtUtils.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+        Jwt token;
+        try {
+            token = getJwtToken();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
 
         Long userId = jwtUtils.extractId(token);
@@ -64,28 +63,19 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
-
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid Authorization header");
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<?> getUserProfile() {
+        Jwt token;
+        try {
+            token = getJwtToken();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
 
-        
-        Jwt token = new Jwt(authorizationHeader.substring(7));
-
-        
-        if (!jwtUtils.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
-        }
-
-        
         Long userId = jwtUtils.extractId(token);
 
-        
         Optional<User> userProfile = userService.getUser(userId);
 
-        
         if (userProfile.isPresent()) {
             return ResponseEntity.ok(userProfile.get());
         } else {
@@ -93,6 +83,28 @@ public class UserController {
         }
     }
 
+    private Jwt getJwtToken() {
+        String authorizationHeader = getAuthorizationHeader();
+        if (!checkAuthorizationHeader(authorizationHeader)) {
+            throw new IllegalArgumentException("Missing or invalid Authorization header");
+        }
+        Jwt token = new Jwt(authorizationHeader.substring(7));
 
+        if (!jwtUtils.validateToken(token)) {
+            throw new IllegalArgumentException("Invalid or expired token");
+        }
+        return token;
+    }
+
+    private String getAuthorizationHeader() {
+        return RequestContextHolder.getRequestAttributes()
+                instanceof ServletRequestAttributes attributes
+                ? attributes.getRequest().getHeader(HttpHeaders.AUTHORIZATION)
+                : null;
+    }
+
+    private boolean checkAuthorizationHeader(String authorizationHeader) {
+        return authorizationHeader != null && authorizationHeader.startsWith("Bearer ");
+    }
 }
 

@@ -1,6 +1,7 @@
 package org.bimbimbambam.hacktemplate.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.bimbimbambam.hacktemplate.config.MinioConfig;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserUpdateAvatarReq;
@@ -20,6 +21,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final MinioConfig minioConfig;
 
     @Override
     public void registerUser(UserRegisterReq userRegisterReq) {
@@ -56,6 +58,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> getUser(Long id) {
-        return userRepository.findById(id);
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            user.setAvatar(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + user.getAvatar());
+        }
+        return Optional.ofNullable(user);
     }
 }

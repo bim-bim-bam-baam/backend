@@ -13,6 +13,10 @@ jwt:
   secretKey: alskdjsdfhlaksdjffhladkfsfhldaksadfhladasdfhljlfhaklfkjadsfhjadkslffhdajlskffhjldkasdfhjkladasdfhjlkasdfjlasdfjkdhsajflfhdsljkffhdasljkfhdasdjklflfhladjsffhaljdssdfhjlkadsasdfhjklsdaasdfhlasdfhladasdflhfhs
   expirationTime: 3600000 # 1 hour in milliseconds
 
+springdoc:
+  swagger-ui:
+    path: /api-docs
+
 minio:
   bucket: dbdb
   access-key: kUDhb98j5XgnvSfE69JN
