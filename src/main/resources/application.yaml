@@ -10,7 +10,7 @@ spring:
       ddl-auto: update
 
 jwt:
-  secretKey: asdjkfkasdjfkl;asdjfds;kajf;laksdjf;kldsajfklajsdfkl;jasdk;lf;jasdlkfjlasdk;jf;klasdjf;lasdjfkl;asdjfkljgkjhjhbviufdsfgjdfjgjkdfshghfjdsgk
+  secretKey: alskdjsdfhlaksdjffhladkfsfhldaksadfhladasdfhljlfhaklfkjadsfhjadkslffhdajlskffhjldkasdfhjkladasdfhjlkasdfjlasdfjkdhsajflfhdsljkffhdasljkfhdasdjklflfhladjsffhaljdssdfhjlkadsasdfhjklsdaasdfhlasdfhladasdflhfhs
   expirationTime: 3600000 # 1 hour in milliseconds
 
 minio:

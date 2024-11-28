@@ -52,11 +52,11 @@ public class JwtUtils {
     }
 
     public Long extractId(Jwt token) {
-        return (Long) Jwts.parser()
+        return Long.valueOf((Integer)Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token.token())
                 .getBody()
-                .get("id");
+                .get("id"));
     }
 
     public boolean hasAdminRole(Jwt token) {
