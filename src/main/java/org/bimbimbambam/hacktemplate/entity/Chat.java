@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table
-public class Like extends AbstractEntity {
+public class Chat extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_user_id", nullable = false)
     private User fromUser;
@@ -16,4 +16,7 @@ public class Like extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_user_id", nullable = false)
     private User toUser;
+
+    @Column(name = "to_user_confirmed", nullable = false)
+    boolean toUserConfirmed = false;
 }
