@@ -36,14 +36,19 @@ public class QuestionServiceImpl implements QuestionService {
         question.setImage(imagePath);
         question.setCategory(category);
 
+        category.setQuestionCount(category.getQuestionCount() + 1);
+        category = categoryRepository.save(category);
+
         return questionRepository.save(question);
     }
 
 
     public void deleteQuestion(Long questionId) {
-        if (!questionRepository.existsById(questionId)) {
-            throw new EntityNotFoundException("Question with ID " + questionId + " not found");
-        }
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new EntityNotFoundException("Question with ID " + questionId + " not found"));
+        Category category = question.getCategory();
+        category.setQuestionCount(category.getQuestionCount() - 1);
+        categoryRepository.save(category);
         questionRepository.deleteById(questionId);
     }
 

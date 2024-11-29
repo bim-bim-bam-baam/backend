@@ -103,21 +103,19 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User id is non-existent"));
 
-        UserCategory userCategory = userCategoryRepository.findByUserAndCategory(user, category).orElse(null);
-        if (userCategory == null) {
-            throw new NotFoundException("User has not participated in this category");
-        }
-
+        UserCategory userCategory = userCategoryRepository.findByUserAndCategory(user, category).orElse(new UserCategory());
 
         if (userCategory.getNextQuestionPos() >= category.getQuestionCount()) {
             throw new NotFoundException("User answered all possible questions");
         }
 
-        Question question = questionRepository.findById(userCategory.getNextQuestionPos()).orElse(null);
+        Question question = questionRepository.findById(userCategory.getNextQuestionPos() + 1).orElse(null);
         if (question == null) {
             throw new InternalServerErrorException("WTF, question should've existed, but it is not");
         }
-        userCategory.setNextQuestionPos(userCategory.getNextQuestionPos() + 1);
+        userCategory.setCategory(category);
+        userCategory.setUser(user);
+        userCategory.setNextQuestionPos(userCategory.getNextQuestionPos());
         userCategoryRepository.save(userCategory);
         return question;
     }
