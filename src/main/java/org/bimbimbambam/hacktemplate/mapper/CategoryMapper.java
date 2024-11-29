@@ -1,14 +1,23 @@
 package org.bimbimbambam.hacktemplate.mapper;
 
+import org.bimbimbambam.hacktemplate.controller.request.CategoryCreateReq;
 import org.bimbimbambam.hacktemplate.entity.Category;
-import org.bimbimbambam.hacktemplate.entity.CategoryDto;
+import org.bimbimbambam.hacktemplate.controller.response.CategoryRes;
+import org.mapstruct.*;
 
-@org.mapstruct.Mapper(unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE, componentModel = "spring")
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface CategoryMapper {
-    Category toEntity(CategoryDto categoryDto);
+    Category toEntity(CategoryRes categoryCreateRes);
 
-    CategoryDto toDto(Category category);
+    CategoryRes toDto(Category category);
 
-    @org.mapstruct.BeanMapping(nullValuePropertyMappingStrategy = org.mapstruct.NullValuePropertyMappingStrategy.IGNORE)
-    Category partialUpdate(CategoryDto categoryDto, @org.mapstruct.MappingTarget Category category);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Category partialUpdate(CategoryRes categoryCreateRes, @MappingTarget Category category);
+
+    Category toEntity(CategoryCreateReq categoryDto);
+
+    CategoryCreateReq toDto1(Category category);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Category partialUpdate(CategoryCreateReq categoryDto, @MappingTarget Category category);
 }

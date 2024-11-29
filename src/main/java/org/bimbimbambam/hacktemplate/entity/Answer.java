@@ -20,5 +20,5 @@ public class Answer extends AbstractEntity {
     private User user;
 
     @Column(nullable = false)
-    private Integer answer;
+    private Long answer;
 }

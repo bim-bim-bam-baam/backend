@@ -5,5 +5,5 @@ import org.bimbimbambam.hacktemplate.entity.Category;
 /**
  * DTO for {@link Category}
  */
-public record CategoryCreateRes(Long id, String name, String avatar) {
+public record CategoryRes(Long id, String name, String avatar) {
 }

@@ -14,4 +14,7 @@ public class Category extends AbstractEntity {
 
     @Column
     private String avatar;
+
+    @Column
+    private Long questionCount = 0L;
 }

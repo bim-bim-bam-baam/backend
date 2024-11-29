@@ -6,21 +6,22 @@ import org.bimbimbambam.hacktemplate.controller.request.image.ImageRequest;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserUpdateAvatarReq;
-import org.bimbimbambam.hacktemplate.entity.Question;
-import org.bimbimbambam.hacktemplate.entity.User;
-import org.bimbimbambam.hacktemplate.entity.UserCategory;
+import org.bimbimbambam.hacktemplate.entity.*;
+import org.bimbimbambam.hacktemplate.exception.InternalServerErrorException;
 import org.bimbimbambam.hacktemplate.exception.UnauthorizedException;
 import org.bimbimbambam.hacktemplate.exception.BadRequestException;
 import org.bimbimbambam.hacktemplate.exception.NotFoundException;
-import org.bimbimbambam.hacktemplate.repository.UserCategoryRepository;
-import org.bimbimbambam.hacktemplate.repository.UserRepository;
+import org.bimbimbambam.hacktemplate.repository.*;
 import org.bimbimbambam.hacktemplate.service.ImageService;
 import org.bimbimbambam.hacktemplate.service.UserService;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,10 +29,14 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserCategoryRepository userCategoryRepository;
+    private final QuestionRepository questionRepository;
+    private final CategoryRepository categoryRepository;
+    private final AnswerRepository answerRepository;
     private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
     private final JwtUtils jwtUtils;
     private final MinioConfig minioConfig;
+
 
 
     @Override
@@ -87,11 +92,57 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Question getNextQuestion(Long userId, Long cateroryId) {
-        UserCategory userCategory = userCategoryRepository.findByUserIdAndCategoryId(userId, cateroryId).orElse(null);
-        if (userCategory == null) {
+    public Question getNextQuestion(Long userId, Long categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElse(null);
 
+        if (category == null) {
+            throw new NotFoundException("Category doesn't exist");
         }
-        return new Question();
+
+        UserCategory userCategory = userCategoryRepository.findByUserIdAndCategoryId(userId, categoryId).orElse(null);
+        if (userCategory == null) {
+            throw new NotFoundException("User has not participated in this category");
+        }
+
+
+        if (userCategory.getNextQuestionPos() >= category.getQuestionCount()) {
+            throw new NotFoundException("User answered all possible questions");
+        }
+
+        Question question = questionRepository.findById(userCategory.getNextQuestionPos()).orElse(null);
+        if (question == null) {
+            throw new InternalServerErrorException("WTF, question should've existed, but it is not");
+        }
+        userCategory.setNextQuestionPos(userCategory.getNextQuestionPos() + 1);
+        userCategoryRepository.save(userCategory);
+        return question;
+    }
+
+    @Override
+    public void answerQuestion(Long userId, Long questionId, Long result) {
+        Question question = questionRepository.findById(questionId).orElse(null);
+        if (question == null) {
+            throw new NotFoundException("Question id doesn't exist");
+        }
+        Answer answer = new Answer();
+        User usr = new User();
+        usr.setId(userId);
+
+        List<Answer> kek = question.getAnswers();
+        kek.add(answer);
+        question.setAnswers(kek);
+        answer.setUser(usr);
+        answer.setAnswer(result);
+        answer.setQuestion(question);
+
+        UserCategory userCategory = userCategoryRepository.findByUserIdAndCategoryId(userId, questionId).orElse(null);
+        if (userCategory == null) {
+            throw new NotFoundException("User has not participated in this category");
+        }
+
+        userCategory.setNextQuestionPos(userCategory.getNextQuestionPos() + 1);
+        userCategoryRepository.save(userCategory);
+        answerRepository.save(answer);
+        questionRepository.save(question);
     }
 }

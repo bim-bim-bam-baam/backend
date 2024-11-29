@@ -4,6 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Data;
 import org.bimbimbambam.hacktemplate.exception.ForbiddenException;
+import org.bimbimbambam.hacktemplate.exception.UnauthorizedException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -74,6 +75,12 @@ public class JwtUtils {
             }
         }
         return false;
+    }
+
+    public void forceAdminRole(Jwt token) {
+        if (!hasAdminRole(token)) {
+            throw new ForbiddenException("No admin rights");
+        }
     }
 
     public Jwt getJwtToken() {

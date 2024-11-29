@@ -18,5 +18,5 @@ public class UserCategory extends AbstractEntity {
     private Category category;
 
     @Column(nullable = false)
-    private Integer cnt = 0;
+    private Long nextQuestionPos = 0L;
 }

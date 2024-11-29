@@ -1,9 +1,6 @@
 package org.bimbimbambam.hacktemplate.controller;
 
-import org.bimbimbambam.hacktemplate.exception.UnauthorizedException;
-import org.bimbimbambam.hacktemplate.exception.ForbiddenException;
-import org.bimbimbambam.hacktemplate.exception.BadRequestException;
-import org.bimbimbambam.hacktemplate.exception.NotFoundException;
+import org.bimbimbambam.hacktemplate.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,6 +9,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class ExceptionController extends ResponseEntityExceptionHandler {
+    @ExceptionHandler(InternalServerErrorException.class)
+    public ResponseEntity<String> internalServeError(InternalServerErrorException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<String> handleInvalidCredentialsException(UnauthorizedException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);

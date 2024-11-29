@@ -1,10 +1,11 @@
-package org.bimbimbambam.hacktemplate.entity;
+package org.bimbimbambam.hacktemplate.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.bimbimbambam.hacktemplate.entity.Category;
 
 /**
  * DTO for {@link Category}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record CategoryDto(String name, String avatar) {
+public record CategoryCreateReq(String name) {
 }

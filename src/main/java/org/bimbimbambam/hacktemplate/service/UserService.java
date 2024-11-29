@@ -17,4 +17,6 @@ public interface UserService {
     User getUser(Long id);
 
     Question getNextQuestion(Long userId, Long cateroryId);
+
+    void answerQuestion(Long userId, Long questionId, Long result);
 }
