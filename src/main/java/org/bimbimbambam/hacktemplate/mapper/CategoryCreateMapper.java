@@ -1,15 +1,15 @@
 package org.bimbimbambam.hacktemplate.mapper;
 
-import org.bimbimbambam.hacktemplate.controller.response.CategoryRes;
+import org.bimbimbambam.hacktemplate.controller.request.CategoryCreateReq;
 import org.bimbimbambam.hacktemplate.entity.Category;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface CategoryMapper {
-    Category toEntity(CategoryRes categoryRes);
+public interface CategoryCreateMapper {
+    Category toEntity(CategoryCreateReq categoryCreateReq);
 
-    CategoryRes toDto(Category category);
+    CategoryCreateReq toDto(Category category);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Category partialUpdate(CategoryRes categoryRes, @MappingTarget Category category);
+    Category partialUpdate(CategoryCreateReq categoryCreateReq, @MappingTarget Category category);
 }

@@ -1,9 +1,7 @@
 package org.bimbimbambam.hacktemplate.controller.response;
 
-import org.bimbimbambam.hacktemplate.entity.Category;
-
 /**
- * DTO for {@link Category}
+ * DTO for {@link org.bimbimbambam.hacktemplate.entity.Category}
  */
-public record CategoryRes(Long id, String name, String avatar) {
+public record CategoryRes(Long id, String name, String avatar, Long questionCount) {
 }

@@ -3,6 +3,7 @@ package org.bimbimbambam.hacktemplate.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.bimbimbambam.hacktemplate.controller.request.CategoryCreateReq;
+import org.bimbimbambam.hacktemplate.controller.request.CategoryIdReq;
 import org.bimbimbambam.hacktemplate.controller.response.CategoryRes;
 import org.bimbimbambam.hacktemplate.mapper.CategoryMapper;
 import org.bimbimbambam.hacktemplate.service.CategoryService;
@@ -27,17 +28,18 @@ public class CategoryController {
         jwtUtils.forceAdminRole(token);
         return categoryMapper.toDto(categoryService.createCategory(categoryCreateRes));
     }
+
     @DeleteMapping("/delete")
     @SecurityRequirement(name = "bearerAuth")
-    public void deleteCategory(@RequestBody Long id) {
+    public void deleteCategory(@RequestBody CategoryIdReq categoryIdReq) {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
         jwtUtils.forceAdminRole(token);
-        categoryService.deleteCategory(id);
+        categoryService.deleteCategory(categoryIdReq.id());
     }
 
-    @GetMapping("/info")
-    public CategoryRes info(@RequestBody Long id) {
-        return categoryMapper.toDto(categoryService.info(id));
+    @GetMapping("/{categoryId}")
+    public CategoryRes getCategory(@PathVariable Long categoryId) {
+        return categoryMapper.toDto(categoryService.info(categoryId));
     }
 }
