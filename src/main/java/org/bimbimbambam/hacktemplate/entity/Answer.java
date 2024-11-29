@@ -1,24 +1,19 @@
 package org.bimbimbambam.hacktemplate.entity;
 
+
 import jakarta.persistence.*;
-import lombok.Data;
 
 @Entity
-@Data
 @Table
-public class Answer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Long id;
+public class Answer extends AbstractEntity {
 
-    @Column(nullable = false)
-    @ManyToOne
-    private Question questionId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "question_id", nullable = false)
+    private Question question;
 
-    @Column(nullable = false)
-    @ManyToOne
-    private User userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private Integer answer;

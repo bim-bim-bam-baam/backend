@@ -1,23 +1,15 @@
 package org.bimbimbambam.hacktemplate.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 @Entity
-@Data
 @Table
-public class Like {
+public class Like extends AbstractEntity {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "from_user_id", nullable = false)
+    private User fromUser;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Long id;
-
-    @Column(nullable = false)
-    @ManyToOne
-    private User fromId;
-
-    @Column(nullable = false)
-    @ManyToOne
-    private User toId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "to_user_id", nullable = false)
+    private User toUser;
 }
