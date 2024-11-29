@@ -2,19 +2,18 @@ package org.bimbimbambam.hacktemplate.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.bimbimbambam.hacktemplate.controller.request.QuestionReq;
 import org.bimbimbambam.hacktemplate.controller.response.QuestionDto;
 import org.bimbimbambam.hacktemplate.entity.Question;
-import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.mapper.QuestionMapper;
 import org.bimbimbambam.hacktemplate.service.QuestionService;
 import org.bimbimbambam.hacktemplate.service.UserService;
-import org.bimbimbambam.hacktemplate.service.impl.UserServiceImpl;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,26 +45,33 @@ public class QuestionController {
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SecurityRequirement(name = "bearerAuth")
-    public QuestionDto addQuestion(
-            @RequestPart("questionReq") QuestionReq questionReq,
-            @RequestParam("categoryId") Long categoryId) {
+    public QuestionDto addQuestion(String content, MultipartFile file, Long categoryId) {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
         jwtUtils.forceAdminRole(token);
         return questionMapper.toDto(questionService.addQuestion(
-                questionReq.content(),
-                questionReq.file(),
+                content,
+                file,
                 categoryId
         ));
     }
 
     @DeleteMapping("/delete/{id}")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
+    public void deleteQuestion(@PathVariable Long id) {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
         jwtUtils.forceAdminRole(token);
         questionService.deleteQuestion(id);
-        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/allByCategory")
+    public List<QuestionDto> all(Long categoryId) {
+        return questionService.all(categoryId).stream().map(questionMapper::toDto).toList();
+    }
+
+    @GetMapping("/all")
+    public List<QuestionDto> all() {
+        return questionService.all().stream().map(questionMapper::toDto).toList();
     }
 }

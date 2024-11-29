@@ -18,6 +18,7 @@ import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -120,27 +121,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void answerQuestion(Long userId, Long questionId, Long result) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new NotFoundException("Question id doesn't exist"));
-        Answer answer = new Answer();
-        User usr = new User();
-        usr.setId(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        Answer answer = answerRepository.findByUserAndQuestion(user, question)
+                .orElse(new Answer());
 
-        List<Answer> kek = question.getAnswers();
-        kek.add(answer);
-        question.setAnswers(kek);
-        answer.setUser(usr);
-        answer.setAnswer(result);
+        answer.setUser(user);
         answer.setQuestion(question);
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        answer.setAnswer(result);
 
         UserCategory userCategory = userCategoryRepository.findByUserAndCategory(user, question.getCategory())
-                .orElseThrow(() -> new NotFoundException("User has not participated in this category"));
+                .orElse(new UserCategory());
 
+        userCategory.setUser(user);
+        userCategory.setCategory(question.getCategory());
         userCategory.setNextQuestionPos(userCategory.getNextQuestionPos() + 1);
+
         userCategoryRepository.save(userCategory);
         answerRepository.save(answer);
         questionRepository.save(question);

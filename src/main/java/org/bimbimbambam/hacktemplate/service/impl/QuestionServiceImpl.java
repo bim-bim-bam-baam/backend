@@ -12,6 +12,8 @@ import org.bimbimbambam.hacktemplate.service.QuestionService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class QuestionServiceImpl implements QuestionService {
@@ -20,26 +22,15 @@ public class QuestionServiceImpl implements QuestionService {
     private final CategoryRepository categoryRepository; // Assuming this exists.
     private final ImageService imageService;
 
-    /**
-     * Adds a new question to the database.
-     *
-     * @param content The content of the question.
-     * @param imageFile The image file (if any) associated with the question.
-     * @param categoryId The category ID to which the question belongs.
-     * @return The saved question.
-     */
     public Question addQuestion(String content, MultipartFile imageFile, Long categoryId) {
-        // Fetch the category by ID
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("Category with ID " + categoryId + " not found"));
 
-        // Upload the image if provided and get the file path
         String imagePath = null;
         if (imageFile != null && !imageFile.isEmpty()) {
             imagePath = imageService.upload(new ImageRequest(imageFile));
         }
 
-        // Create and save the question
         Question question = new Question();
         question.setContent(content);
         question.setImage(imagePath);
@@ -48,15 +39,21 @@ public class QuestionServiceImpl implements QuestionService {
         return questionRepository.save(question);
     }
 
-    /**
-     * Deletes a question by its ID.
-     *
-     * @param questionId The ID of the question to delete.
-     */
+
     public void deleteQuestion(Long questionId) {
         if (!questionRepository.existsById(questionId)) {
             throw new EntityNotFoundException("Question with ID " + questionId + " not found");
         }
         questionRepository.deleteById(questionId);
+    }
+
+    @Override
+    public List<Question> all() {
+        return questionRepository.findAll();
+    }
+
+    @Override
+    public List<Question> all(Long categoryId) {
+        return questionRepository.findAllByCategoryId(categoryId);
     }
 }

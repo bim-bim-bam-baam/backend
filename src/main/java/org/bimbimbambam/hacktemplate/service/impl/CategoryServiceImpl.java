@@ -9,6 +9,8 @@ import org.bimbimbambam.hacktemplate.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
@@ -29,6 +31,11 @@ public class CategoryServiceImpl implements CategoryService {
     public Category info(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Catefory does not exist"));
+    }
+
+    @Override
+    public List<Category> all() {
+        return categoryRepository.findAll();
     }
 
     @Override

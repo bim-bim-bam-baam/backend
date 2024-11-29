@@ -11,6 +11,8 @@ import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/category")
 @RequiredArgsConstructor
@@ -41,5 +43,10 @@ public class CategoryController {
     @GetMapping("/{categoryId}")
     public CategoryRes getCategory(@PathVariable Long categoryId) {
         return categoryMapper.toDto(categoryService.info(categoryId));
+    }
+
+    @GetMapping("/all")
+    public List<CategoryRes> getCategories() {
+        return categoryService.all().stream().map(categoryMapper::toDto).toList();
     }
 }
