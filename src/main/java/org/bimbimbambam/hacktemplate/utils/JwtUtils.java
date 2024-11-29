@@ -3,8 +3,12 @@ package org.bimbimbambam.hacktemplate.utils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Data;
+import org.bimbimbambam.hacktemplate.exception.JwtTokenException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Date;
 
@@ -52,7 +56,7 @@ public class JwtUtils {
     }
 
     public Long extractId(Jwt token) {
-        return Long.valueOf((Integer)Jwts.parser()
+        return Long.valueOf((Integer) Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token.token())
                 .getBody()
@@ -70,5 +74,29 @@ public class JwtUtils {
             }
         }
         return false;
+    }
+
+    public Jwt getJwtToken() {
+        String authorizationHeader = getAuthorizationHeader();
+        if (!checkAuthorizationHeader(authorizationHeader)) {
+            throw new JwtTokenException("Missing or invalid Authorization header");
+        }
+        Jwt token = new Jwt(authorizationHeader.substring(7));
+
+        if (!validateToken(token)) {
+            throw new JwtTokenException("Invalid or expired token");
+        }
+        return token;
+    }
+
+    private String getAuthorizationHeader() {
+        return RequestContextHolder.getRequestAttributes()
+                instanceof ServletRequestAttributes attributes
+                ? attributes.getRequest().getHeader(HttpHeaders.AUTHORIZATION)
+                : null;
+    }
+
+    private boolean checkAuthorizationHeader(String authorizationHeader) {
+        return authorizationHeader != null && authorizationHeader.startsWith("Bearer ");
     }
 }

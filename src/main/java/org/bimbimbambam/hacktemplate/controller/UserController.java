@@ -9,15 +9,8 @@ import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.service.impl.UserServiceImpl;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,85 +20,30 @@ public class UserController {
     private final JwtUtils jwtUtils;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody UserRegisterReq userRegisterReq) {
-        try {
-            userService.registerUser(userRegisterReq);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
+    public void registerUser(@RequestBody UserRegisterReq userRegisterReq) {
+        userService.registerUser(userRegisterReq);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody UserLoginReq userLoginReq) {
-        Optional<Jwt> jwt = userService.loginUser(userLoginReq);
-        if (jwt.isPresent()) {
-            return ResponseEntity.ok(jwt.get());
-        }
-        return ResponseEntity.status(401).body("Invalid username or password");
+    public Jwt loginUser(@RequestBody UserLoginReq userLoginReq) {
+        return userService.loginUser(userLoginReq);
     }
 
     @PostMapping(value = "/updateAvatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<?> updateAvatar(
+    public void updateAvatar(
             @ModelAttribute UserUpdateAvatarReq userUpdateAvatarReq) {
-        Jwt token;
-        try {
-            token = getJwtToken();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
-
+        Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
-
         userService.updateAvatar(userId, userUpdateAvatarReq);
-
-        return ResponseEntity.status(HttpStatus.OK).body("Avatar updated successfully");
     }
 
     @GetMapping("/profile")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<?> getUserProfile() {
-        Jwt token;
-        try {
-            token = getJwtToken();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
-
+    public User getUserProfile() {
+        Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
-
-        Optional<User> userProfile = userService.getUser(userId);
-
-        if (userProfile.isPresent()) {
-            return ResponseEntity.ok(userProfile.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User profile not found");
-        }
-    }
-
-    private Jwt getJwtToken() {
-        String authorizationHeader = getAuthorizationHeader();
-        if (!checkAuthorizationHeader(authorizationHeader)) {
-            throw new IllegalArgumentException("Missing or invalid Authorization header");
-        }
-        Jwt token = new Jwt(authorizationHeader.substring(7));
-
-        if (!jwtUtils.validateToken(token)) {
-            throw new IllegalArgumentException("Invalid or expired token");
-        }
-        return token;
-    }
-
-    private String getAuthorizationHeader() {
-        return RequestContextHolder.getRequestAttributes()
-                instanceof ServletRequestAttributes attributes
-                ? attributes.getRequest().getHeader(HttpHeaders.AUTHORIZATION)
-                : null;
-    }
-
-    private boolean checkAuthorizationHeader(String authorizationHeader) {
-        return authorizationHeader != null && authorizationHeader.startsWith("Bearer ");
+        return userService.getUser(userId);
     }
 }
 

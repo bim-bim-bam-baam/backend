@@ -7,6 +7,9 @@ import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserUpdateAvatarReq;
 import org.bimbimbambam.hacktemplate.entity.User;
+import org.bimbimbambam.hacktemplate.exception.InvalidCredentialsException;
+import org.bimbimbambam.hacktemplate.exception.UserExistException;
+import org.bimbimbambam.hacktemplate.exception.UserNotFoundException;
 import org.bimbimbambam.hacktemplate.repository.UserRepository;
 import org.bimbimbambam.hacktemplate.service.ImageService;
 import org.bimbimbambam.hacktemplate.service.UserService;
@@ -29,7 +32,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerUser(UserRegisterReq userRegisterReq) {
         if (userRepository.findByUsername(userRegisterReq.username()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new UserExistException("Username already exists");
         }
 
         User newUser = new User();
@@ -41,31 +44,40 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<Jwt> loginUser(UserLoginReq userLoginReq) {
+    public Jwt loginUser(UserLoginReq userLoginReq) {
         Optional<User> user = userRepository.findByUsername(userLoginReq.username());
-        if (user.isPresent() && passwordEncoder.matches(userLoginReq.password(), user.get().getPassword())) {
-            Jwt token = jwtUtils.generateToken(user.get().getUsername(), user.get().getId(), user.get().getRoles());
-            return Optional.of(token);
+        if (user.isEmpty()) {
+            throw new InvalidCredentialsException("Username not found");
         }
-        return Optional.empty();
+
+        if (!passwordEncoder.matches(userLoginReq.password(), user.get().getPassword())) {
+            throw new InvalidCredentialsException("Wrong password");
+        }
+
+        return jwtUtils.generateToken(user.get().getUsername(), user.get().getId(), user.get().getRoles());
     }
 
     @Override
     public void updateAvatar(Long id, UserUpdateAvatarReq updateAvatarReq) {
         Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            String filename = imageService.upload(new ImageRequest(updateAvatarReq.image()));
-            user.get().setAvatar(filename);
-            userRepository.save(user.get());
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User not found");
         }
+
+        String filename = imageService.upload(new ImageRequest(updateAvatarReq.image()));
+        user.get().setAvatar(filename);
+        userRepository.save(user.get());
     }
 
     @Override
-    public Optional<User> getUser(Long id) {
-        User user = userRepository.findById(id).orElse(null);
-        if (user != null) {
-            user.setAvatar(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + user.getAvatar());
+    public User getUser(Long id) {
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User not found");
         }
-        return Optional.ofNullable(user);
+
+        user.get().setPassword(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + user.get().getAvatar());
+        return user.get();
     }
 }
