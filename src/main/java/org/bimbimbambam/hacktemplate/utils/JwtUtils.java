@@ -3,7 +3,7 @@ package org.bimbimbambam.hacktemplate.utils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Data;
-import org.bimbimbambam.hacktemplate.exception.JwtTokenException;
+import org.bimbimbambam.hacktemplate.exception.ForbiddenException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -79,12 +79,12 @@ public class JwtUtils {
     public Jwt getJwtToken() {
         String authorizationHeader = getAuthorizationHeader();
         if (!checkAuthorizationHeader(authorizationHeader)) {
-            throw new JwtTokenException("Missing or invalid Authorization header");
+            throw new ForbiddenException("Missing or invalid Authorization header");
         }
         Jwt token = new Jwt(authorizationHeader.substring(7));
 
         if (!validateToken(token)) {
-            throw new JwtTokenException("Invalid or expired token");
+            throw new ForbiddenException("Invalid or expired token");
         }
         return token;
     }

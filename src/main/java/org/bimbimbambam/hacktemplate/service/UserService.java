@@ -16,5 +16,5 @@ public interface UserService {
 
     User getUser(Long id);
 
-    Question getNextQuestion(Long cateroryId);
+    Question getNextQuestion(Long userId, Long cateroryId);
 }

@@ -8,9 +8,10 @@ import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserUpdateAvatarReq;
 import org.bimbimbambam.hacktemplate.entity.Question;
 import org.bimbimbambam.hacktemplate.entity.User;
-import org.bimbimbambam.hacktemplate.exception.InvalidCredentialsException;
-import org.bimbimbambam.hacktemplate.exception.UserExistException;
-import org.bimbimbambam.hacktemplate.exception.UserNotFoundException;
+import org.bimbimbambam.hacktemplate.entity.UserCategory;
+import org.bimbimbambam.hacktemplate.exception.UnauthorizedException;
+import org.bimbimbambam.hacktemplate.exception.BadRequestException;
+import org.bimbimbambam.hacktemplate.exception.NotFoundException;
 import org.bimbimbambam.hacktemplate.repository.UserCategoryRepository;
 import org.bimbimbambam.hacktemplate.repository.UserRepository;
 import org.bimbimbambam.hacktemplate.service.ImageService;
@@ -36,7 +37,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerUser(UserRegisterReq userRegisterReq) {
         if (userRepository.findByUsername(userRegisterReq.username()).isPresent()) {
-            throw new UserExistException("Username already exists");
+            throw new BadRequestException("Username already exists");
         }
 
         User newUser = new User();
@@ -51,11 +52,11 @@ public class UserServiceImpl implements UserService {
     public Jwt loginUser(UserLoginReq userLoginReq) {
         Optional<User> user = userRepository.findByUsername(userLoginReq.username());
         if (user.isEmpty()) {
-            throw new InvalidCredentialsException("Username not found");
+            throw new UnauthorizedException("Username not found");
         }
 
         if (!passwordEncoder.matches(userLoginReq.password(), user.get().getPassword())) {
-            throw new InvalidCredentialsException("Wrong password");
+            throw new UnauthorizedException("Wrong password");
         }
 
         return jwtUtils.generateToken(user.get().getUsername(), user.get().getId(), user.get().getRoles());
@@ -65,7 +66,7 @@ public class UserServiceImpl implements UserService {
     public void updateAvatar(Long id, UserUpdateAvatarReq updateAvatarReq) {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
-            throw new UserNotFoundException("User not found");
+            throw new NotFoundException("User not found");
         }
 
         String filename = imageService.upload(new ImageRequest(updateAvatarReq.image()));
@@ -78,7 +79,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findById(id);
 
         if (user.isEmpty()) {
-            throw new UserNotFoundException("User not found");
+            throw new NotFoundException("User not found");
         }
 
         user.get().setPassword(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + user.get().getAvatar());
@@ -86,9 +87,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Question getNextQuestion(Long cateroryId) {
-        userCategoryRepository.findById(cateroryId);
+    public Question getNextQuestion(Long userId, Long cateroryId) {
+        UserCategory userCategory = userCategoryRepository.findByUserIdAndCategoryId(userId, cateroryId).orElse(null);
+        if (userCategory == null) {
 
+        }
         return new Question();
     }
 }
