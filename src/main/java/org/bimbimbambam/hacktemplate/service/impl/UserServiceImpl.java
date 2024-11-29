@@ -7,10 +7,10 @@ import org.bimbimbambam.hacktemplate.controller.request.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.UserRegisterReq;
 import org.bimbimbambam.hacktemplate.controller.request.UserUpdateAvatarReq;
 import org.bimbimbambam.hacktemplate.entity.*;
-import org.bimbimbambam.hacktemplate.exception.InternalServerErrorException;
-import org.bimbimbambam.hacktemplate.exception.UnauthorizedException;
 import org.bimbimbambam.hacktemplate.exception.BadRequestException;
+import org.bimbimbambam.hacktemplate.exception.InternalServerErrorException;
 import org.bimbimbambam.hacktemplate.exception.NotFoundException;
+import org.bimbimbambam.hacktemplate.exception.UnauthorizedException;
 import org.bimbimbambam.hacktemplate.repository.*;
 import org.bimbimbambam.hacktemplate.service.ImageService;
 import org.bimbimbambam.hacktemplate.service.UserService;
@@ -20,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,7 +34,6 @@ public class UserServiceImpl implements UserService {
     private final ImageService imageService;
     private final JwtUtils jwtUtils;
     private final MinioConfig minioConfig;
-
 
 
     @Override
@@ -108,7 +106,6 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("User has not participated in this category");
         }
 
-
         if (userCategory.getNextQuestionPos() >= category.getQuestionCount()) {
             throw new NotFoundException("User answered all possible questions");
         }
@@ -119,6 +116,11 @@ public class UserServiceImpl implements UserService {
         }
         userCategory.setNextQuestionPos(userCategory.getNextQuestionPos() + 1);
         userCategoryRepository.save(userCategory);
+
+        if (question.getImage() != null) {
+            question.setImage(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + question.getImage());
+        }
+
         return question;
     }
 

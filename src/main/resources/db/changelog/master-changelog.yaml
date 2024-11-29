@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/changelog-user-category.yaml
   - include:
       file: db/changelog/changelog-insert-admin-user.yaml
+  - include:
+      file: db/changelog/changelog-add-base-category.yaml

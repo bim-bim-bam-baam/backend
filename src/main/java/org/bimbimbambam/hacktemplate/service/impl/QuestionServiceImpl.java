@@ -2,6 +2,7 @@ package org.bimbimbambam.hacktemplate.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.bimbimbambam.hacktemplate.config.MinioConfig;
 import org.bimbimbambam.hacktemplate.controller.request.ImageRequest;
 import org.bimbimbambam.hacktemplate.entity.Category;
 import org.bimbimbambam.hacktemplate.entity.Question;
@@ -21,6 +22,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
     private final CategoryRepository categoryRepository; // Assuming this exists.
     private final ImageService imageService;
+    private final MinioConfig minioConfig;
 
     public Question addQuestion(String content, MultipartFile imageFile, Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
@@ -39,7 +41,6 @@ public class QuestionServiceImpl implements QuestionService {
         return questionRepository.save(question);
     }
 
-
     public void deleteQuestion(Long questionId) {
         if (!questionRepository.existsById(questionId)) {
             throw new EntityNotFoundException("Question with ID " + questionId + " not found");
@@ -49,11 +50,21 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<Question> all() {
-        return questionRepository.findAll();
+        return questionRepository.findAll().stream()
+                .peek(question -> {
+                    if (question.getImage() != null) {
+                        question.setImage(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + question.getImage());
+                    }
+                }).toList();
     }
 
     @Override
     public List<Question> all(Long categoryId) {
-        return questionRepository.findAllByCategoryId(categoryId);
+        return questionRepository.findAllByCategoryId(categoryId).stream()
+                .peek(question -> {
+                    if(question.getImage() != null) {
+                        question.setImage(minioConfig.getUrl()+"/"+minioConfig.getBucket()+"/"+question.getImage());
+                    }
+                }).toList();
     }
 }

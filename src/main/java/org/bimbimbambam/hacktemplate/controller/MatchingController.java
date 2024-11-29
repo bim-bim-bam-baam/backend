@@ -1,5 +1,6 @@
 package org.bimbimbambam.hacktemplate.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.bimbimbambam.hacktemplate.controller.response.UserMatchingDto;
 import org.bimbimbambam.hacktemplate.service.MatchingService;
@@ -20,6 +21,7 @@ public class MatchingController {
     private final JwtUtils jwtUtils;
 
     @GetMapping("/{categoryId}")
+    @SecurityRequirement(name = "bearerAuth")
     public List<UserMatchingDto> getClosest(@PathVariable Long categoryId) {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
