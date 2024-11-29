@@ -109,13 +109,11 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("User answered all possible questions");
         }
 
-        Question question = questionRepository.findById(userCategory.getNextQuestionPos() + 1).orElse(null);
+        Question question = questionRepository.findById(userCategory.getNextQuestionPos()).orElse(null);
         if (question == null) {
             throw new InternalServerErrorException("WTF, question should've existed, but it is not");
         }
-        userCategory.setCategory(category);
-        userCategory.setUser(user);
-        userCategory.setNextQuestionPos(userCategory.getNextQuestionPos());
+        userCategory.setNextQuestionPos(userCategory.getNextQuestionPos() + 1);
         userCategoryRepository.save(userCategory);
         return question;
     }
