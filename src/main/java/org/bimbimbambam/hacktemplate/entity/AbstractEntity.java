@@ -6,12 +6,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
-@Table
-public class Category extends AbstractEntity {
+@MappedSuperclass
+public class AbstractEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private String name;
-
-    @Column
-    private String avatar;
+    private Long id;
 }

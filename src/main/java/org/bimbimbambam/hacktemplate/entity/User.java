@@ -1,19 +1,16 @@
 package org.bimbimbambam.hacktemplate.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
-@Data
-@Table
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Long id;
+import java.util.List;
 
+@Getter
+@Setter
+@Entity
+@Table
+public class User extends AbstractEntity {
     @Column(nullable = false, unique = true)
     private String username;
 
@@ -25,4 +22,13 @@ public class User {
 
     @Column(nullable = false)
     private String roles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Answer> answers;
+
+    @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likesSent;
+
+    @OneToMany(mappedBy = "toUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likesReceived;
 }
