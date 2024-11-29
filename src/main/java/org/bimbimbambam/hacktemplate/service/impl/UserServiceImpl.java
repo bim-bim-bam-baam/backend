@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("User not found");
         }
 
-        user.get().setPassword(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + user.get().getAvatar());
+        user.get().setAvatar(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + user.get().getAvatar());
         return user.get();
     }
 

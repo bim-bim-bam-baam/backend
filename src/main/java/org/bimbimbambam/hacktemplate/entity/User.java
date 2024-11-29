@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table
+@Table(name="users")
 public class User extends AbstractEntity {
     @Column(nullable = false, unique = true)
     private String username;
@@ -21,14 +21,14 @@ public class User extends AbstractEntity {
     private String avatar;
 
     @Column(nullable = false)
-    private String roles;
+    private String roles = "USER";
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers;
 
     @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likesSent;
+    private List<Chat> likesSent;
 
     @OneToMany(mappedBy = "toUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likesReceived;
+    private List<Chat> likesReceived;
 }

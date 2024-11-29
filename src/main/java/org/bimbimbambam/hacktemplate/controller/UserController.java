@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserUpdateAvatarReq;
+import org.bimbimbambam.hacktemplate.controller.response.UserProfileDto;
 import org.bimbimbambam.hacktemplate.entity.Question;
 import org.bimbimbambam.hacktemplate.entity.User;
+import org.bimbimbambam.hacktemplate.mapper.UserMapper;
 import org.bimbimbambam.hacktemplate.service.impl.UserServiceImpl;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserServiceImpl userService;
     private final JwtUtils jwtUtils;
+
+    private final UserMapper userMapper;
 
     @PostMapping("/register")
     public void registerUser(@RequestBody UserRegisterReq userRegisterReq) {
@@ -41,10 +45,15 @@ public class UserController {
 
     @GetMapping("/profile")
     @SecurityRequirement(name = "bearerAuth")
-    public User getUserProfile() {
+    public UserProfileDto getUserProfile() {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
-        return userService.getUser(userId);
+        return userMapper.toDto(userService.getUser(userId));
+    }
+
+    @GetMapping("/{userId}")
+    public UserProfileDto getUser(@PathVariable Long userId) {
+        return userMapper.toDto(userService.getUser(userId));
     }
 
     @GetMapping("/getNextQuestion")
