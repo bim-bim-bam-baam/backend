@@ -1,4 +1,4 @@
-package org.bimbimbambam.hacktemplate.controller.request.image;
+package org.bimbimbambam.hacktemplate.controller.request;
 
 import org.springframework.web.multipart.MultipartFile;
 

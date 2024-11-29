@@ -7,17 +7,11 @@ databaseChangeLog:
             tableName: users
             columns:
               - column:
-                  name: id
-                  value: 1
-              - column:
                   name: username
                   value: admin
               - column:
                   name: password
                   value: $2a$10$HX23BZfb3aEYVYQmSp.4c.M.NoEbJXU0UaxFWtpTgDuh6rKsyLzjO
-              - column:
-                  name: avatar
-                  value: admin-avatar.png
               - column:
                   name: roles
                   value: ADMIN

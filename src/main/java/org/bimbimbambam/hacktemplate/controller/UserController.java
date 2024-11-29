@@ -2,12 +2,10 @@ package org.bimbimbambam.hacktemplate.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
-import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
-import org.bimbimbambam.hacktemplate.controller.request.user.UserUpdateAvatarReq;
+import org.bimbimbambam.hacktemplate.controller.request.UserLoginReq;
+import org.bimbimbambam.hacktemplate.controller.request.UserRegisterReq;
+import org.bimbimbambam.hacktemplate.controller.request.UserUpdateAvatarReq;
 import org.bimbimbambam.hacktemplate.controller.response.UserProfileDto;
-import org.bimbimbambam.hacktemplate.entity.Question;
-import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.mapper.UserMapper;
 import org.bimbimbambam.hacktemplate.service.impl.UserServiceImpl;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
@@ -54,22 +52,6 @@ public class UserController {
     @GetMapping("/{userId}")
     public UserProfileDto getUser(@PathVariable Long userId) {
         return userMapper.toDto(userService.getUser(userId));
-    }
-
-    @GetMapping("/getNextQuestion")
-    @SecurityRequirement(name = "bearerAuth")
-    public Question getNextQuestionForUser(Long categoryId) {
-        Jwt token = jwtUtils.getJwtToken();
-        Long userId = jwtUtils.extractId(token);
-        return userService.getNextQuestion(userId, categoryId);
-    }
-
-    @GetMapping("/setQuestion")
-    @SecurityRequirement(name = "bearerAuth")
-    public void setQuestionForUser(Long questionId, Long result) {
-        Jwt token = jwtUtils.getJwtToken();
-        Long userId = jwtUtils.extractId(token);
-        userService.answerQuestion(userId, questionId, result);
     }
 }
 

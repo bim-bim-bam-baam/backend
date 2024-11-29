@@ -5,7 +5,7 @@ import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.bimbimbambam.hacktemplate.config.MinioConfig;
-import org.bimbimbambam.hacktemplate.controller.request.image.ImageRequest;
+import org.bimbimbambam.hacktemplate.controller.request.ImageRequest;
 import org.bimbimbambam.hacktemplate.service.ImageService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

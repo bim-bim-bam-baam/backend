@@ -1,7 +1,7 @@
 package org.bimbimbambam.hacktemplate.service;
 
 import lombok.SneakyThrows;
-import org.bimbimbambam.hacktemplate.controller.request.image.ImageRequest;
+import org.bimbimbambam.hacktemplate.controller.request.ImageRequest;
 
 public interface ImageService {
     @SneakyThrows

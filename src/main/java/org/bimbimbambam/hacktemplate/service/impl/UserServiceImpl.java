@@ -2,10 +2,10 @@ package org.bimbimbambam.hacktemplate.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.bimbimbambam.hacktemplate.config.MinioConfig;
-import org.bimbimbambam.hacktemplate.controller.request.image.ImageRequest;
-import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
-import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
-import org.bimbimbambam.hacktemplate.controller.request.user.UserUpdateAvatarReq;
+import org.bimbimbambam.hacktemplate.controller.request.ImageRequest;
+import org.bimbimbambam.hacktemplate.controller.request.UserLoginReq;
+import org.bimbimbambam.hacktemplate.controller.request.UserRegisterReq;
+import org.bimbimbambam.hacktemplate.controller.request.UserUpdateAvatarReq;
 import org.bimbimbambam.hacktemplate.entity.*;
 import org.bimbimbambam.hacktemplate.exception.InternalServerErrorException;
 import org.bimbimbambam.hacktemplate.exception.UnauthorizedException;
@@ -16,11 +16,9 @@ import org.bimbimbambam.hacktemplate.service.ImageService;
 import org.bimbimbambam.hacktemplate.service.UserService;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
