@@ -18,8 +18,8 @@ springdoc:
     path: /api-docs
 
 minio:
-  bucket: dbdb
-  access-key: kUDhb98j5XgnvSfE69JN
-  secret-key: HTS5b2XaPmMyBodQUuph1DfuEtcE6PmJv2DK0in0
+  bucket: images
+  access-key: bimbimbambam
+  secret-key: bimbimbambam
   url: http://localhost:9000
 
