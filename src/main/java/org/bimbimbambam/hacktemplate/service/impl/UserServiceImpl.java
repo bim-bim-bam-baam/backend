@@ -6,10 +6,12 @@ import org.bimbimbambam.hacktemplate.controller.request.image.ImageRequest;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserRegisterReq;
 import org.bimbimbambam.hacktemplate.controller.request.user.UserUpdateAvatarReq;
+import org.bimbimbambam.hacktemplate.entity.Question;
 import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.exception.InvalidCredentialsException;
 import org.bimbimbambam.hacktemplate.exception.UserExistException;
 import org.bimbimbambam.hacktemplate.exception.UserNotFoundException;
+import org.bimbimbambam.hacktemplate.repository.UserCategoryRepository;
 import org.bimbimbambam.hacktemplate.repository.UserRepository;
 import org.bimbimbambam.hacktemplate.service.ImageService;
 import org.bimbimbambam.hacktemplate.service.UserService;
@@ -24,10 +26,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserCategoryRepository userCategoryRepository;
     private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
     private final JwtUtils jwtUtils;
     private final MinioConfig minioConfig;
+
 
     @Override
     public void registerUser(UserRegisterReq userRegisterReq) {
@@ -79,5 +83,12 @@ public class UserServiceImpl implements UserService {
 
         user.get().setPassword(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + user.get().getAvatar());
         return user.get();
+    }
+
+    @Override
+    public Question getNextQuestion(Long cateroryId) {
+        userCategoryRepository.findById(cateroryId);
+
+        return new Question();
     }
 }

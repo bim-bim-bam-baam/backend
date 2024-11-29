@@ -1,28 +1,28 @@
 package org.bimbimbambam.hacktemplate.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
 @Entity
-@Table(name = "users")
+@Data
+@Table
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(nullable = false)
     private Long id;
 
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(nullable = false)
     private String password;
 
-    @Column(name = "avatar")
+    @Column
     private String avatar;
 
-    @Column(name = "roles")
+    @Column(nullable = false)
     private String roles;
 }
