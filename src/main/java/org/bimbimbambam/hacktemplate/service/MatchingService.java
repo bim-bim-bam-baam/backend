@@ -1,10 +1,9 @@
 package org.bimbimbambam.hacktemplate.service;
 
-import org.bimbimbambam.hacktemplate.controller.request.UserLoginReq;
-import org.bimbimbambam.hacktemplate.entity.User;
+import org.bimbimbambam.hacktemplate.controller.response.UserMatchingDto;
 
 import java.util.List;
 
 public interface MatchingService {
-    List<User> getClosest(Long userId);
+    List<UserMatchingDto> getClosest(Long userId, Long categoryId);
 }
