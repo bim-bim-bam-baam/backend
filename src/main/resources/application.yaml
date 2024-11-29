@@ -7,7 +7,11 @@ spring:
     password: db
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
+
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/master-changelog.yaml
 
 jwt:
   secretKey: alskdjsdfhlaksdjffhladkfsfhldaksadfhladasdfhljlfhaklfkjadsfhjadkslffhdajlskffhjldkasdfhjkladasdfhjlkasdfjlasdfjkdhsajflfhdsljkffhdasljkfhdasdjklflfhladjsffhaljdssdfhjlkadsasdfhjklsdaasdfhlasdfhladasdflhfhs

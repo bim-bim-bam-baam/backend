@@ -99,7 +99,10 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("Category doesn't exist");
         }
 
-        UserCategory userCategory = userCategoryRepository.findByUserIdAndCategoryId(userId, categoryId).orElse(null);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User id is non-existent"));
+
+        UserCategory userCategory = userCategoryRepository.findByUserAndCategory(user, category).orElse(null);
         if (userCategory == null) {
             throw new NotFoundException("User has not participated in this category");
         }
@@ -120,10 +123,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void answerQuestion(Long userId, Long questionId, Long result) {
-        Question question = questionRepository.findById(questionId).orElse(null);
-        if (question == null) {
-            throw new NotFoundException("Question id doesn't exist");
-        }
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new NotFoundException("Question id doesn't exist"));
         Answer answer = new Answer();
         User usr = new User();
         usr.setId(userId);
@@ -135,10 +136,11 @@ public class UserServiceImpl implements UserService {
         answer.setAnswer(result);
         answer.setQuestion(question);
 
-        UserCategory userCategory = userCategoryRepository.findByUserIdAndCategoryId(userId, questionId).orElse(null);
-        if (userCategory == null) {
-            throw new NotFoundException("User has not participated in this category");
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        UserCategory userCategory = userCategoryRepository.findByUserAndCategory(user, question.getCategory())
+                .orElseThrow(() -> new NotFoundException("User has not participated in this category"));
 
         userCategory.setNextQuestionPos(userCategory.getNextQuestionPos() + 1);
         userCategoryRepository.save(userCategory);

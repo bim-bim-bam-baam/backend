@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changelog-category.yaml
+  - include:
+      file: db/changelog/changelog-question.yaml
+  - include:
+      file: db/changelog/changelog-user.yaml
+  - include:
+      file: db/changelog/changelog-answer.yaml
+  - include:
+      file: db/changelog/changelog-chat.yaml
+  - include:
+      file: db/changelog/changelog-message.yaml
+  - include:
+      file: db/changelog/changelog-user-category.yaml
+  - include:
+      file: db/changelog/changelog-insert-admin-user.yaml
