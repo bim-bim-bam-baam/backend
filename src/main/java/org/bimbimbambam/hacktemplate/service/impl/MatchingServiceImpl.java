@@ -1,6 +1,7 @@
 package org.bimbimbambam.hacktemplate.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.bimbimbambam.hacktemplate.config.MinioConfig;
 import org.bimbimbambam.hacktemplate.controller.response.UserMatchingDto;
 import org.bimbimbambam.hacktemplate.entity.*;
 import org.bimbimbambam.hacktemplate.exception.NotFoundException;
@@ -24,6 +25,7 @@ public class MatchingServiceImpl implements MatchingService {
     private final CategoryRepository categoryRepository;
     private final ChatRepository chatRepository;
     private final UserCategoryRepository userCategoryRepository;
+    private final MinioConfig minioConfig;
 
     @Override
     public List<UserMatchingDto> getClosest(Long userId, Long categoryId) {
@@ -37,6 +39,7 @@ public class MatchingServiceImpl implements MatchingService {
 
         List<User> connectedUserIds = chatRepository.findAllByFromUserOrToUser(currentUser, currentUser).stream()
                 .flatMap(chat -> Stream.of(chat.getFromUser(), chat.getToUser()))
+                .filter(user -> !user.getId().equals(userId))
                 .distinct().toList();
 
         List<User> availableUsers = userCategoryRepository.findAllByCategory(category).stream()
@@ -44,8 +47,7 @@ public class MatchingServiceImpl implements MatchingService {
 
         List<User> allUsers = userRepository.findAll().stream()
                 .filter(availableUsers::contains)
-                .filter(user -> !connectedUserIds.contains(user))
-                .filter(user -> !user.equals(currentUser)).toList();
+                .filter(user -> !connectedUserIds.contains(user)).toList();
 
         Map<Long, Map<Long, Long>> userAnswers = buildUserAnswersMap(allUsers, questions);
         Map<Long, Long> targetUserAnswers = userAnswers.getOrDefault(userId, new HashMap<>());
@@ -55,7 +57,7 @@ public class MatchingServiceImpl implements MatchingService {
                 .map(user -> {
                     Map<Long, Long> otherUserAnswers = userAnswers.getOrDefault(user.getId(), new HashMap<>());
                     double similarity = calculateCosineSimilarity(targetUserAnswers, otherUserAnswers, questions);
-                    return new UserMatchingDto(user.getId(), user.getUsername(), user.getAvatar(), Math.round(similarity * 100));
+                    return toUserMatchingDto(user, similarity);
                 })
                 .sorted((a, b) -> Long.compare(b.similarity(), a.similarity()))
                 .collect(Collectors.toList());
@@ -87,5 +89,17 @@ public class MatchingServiceImpl implements MatchingService {
         }
 
         return normUser1 == 0 || normUser2 == 0 ? 0.0 : dotProduct / (Math.sqrt(normUser1) * Math.sqrt(normUser2));
+    }
+
+    private UserMatchingDto toUserMatchingDto(User user, double similarity) {
+        if (user.getAvatar() != null) {
+            user.setAvatar(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + user.getAvatar());
+        }
+        return new UserMatchingDto(
+                user.getId(),
+                user.getUsername(),
+                user.getAvatar(),
+                Math.round(similarity * 100)
+        );
     }
 }
