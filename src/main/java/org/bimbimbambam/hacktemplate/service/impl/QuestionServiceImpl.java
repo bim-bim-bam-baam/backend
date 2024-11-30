@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -71,5 +72,17 @@ public class QuestionServiceImpl implements QuestionService {
                         question.setImage(minioConfig.getUrl()+"/"+minioConfig.getBucket()+"/"+question.getImage());
                     }
                 }).toList();
+    }
+
+    public void insertQuestions(Map<String, String> questionDescriptions, String categoryName) {
+        Category category = categoryRepository.findByName(categoryName)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+
+        questionDescriptions.forEach((code, description) -> {
+            Question question = new Question();
+            question.setContent(description);
+            question.setCategory(category);
+            questionRepository.save(question);
+        });
     }
 }
