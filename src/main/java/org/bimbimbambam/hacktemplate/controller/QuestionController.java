@@ -28,10 +28,10 @@ public class QuestionController {
 
     @GetMapping("/getNextQuestion")
     @SecurityRequirement(name = "bearerAuth")
-    public Question getNextQuestionForUser(Long categoryId) {
+    public QuestionDto getNextQuestionForUser(Long categoryId) {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
-        return userService.getNextQuestion(userId, categoryId);
+        return questionMapper.toDto(userService.getNextQuestion(userId, categoryId));
     }
 
     @GetMapping("/setAnswer")

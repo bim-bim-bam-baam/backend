@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -38,13 +39,18 @@ public class QuestionServiceImpl implements QuestionService {
         question.setImage(imagePath);
         question.setCategory(category);
 
+        category.setQuestionCount(category.getQuestionCount() + 1);
+        category = categoryRepository.save(category);
+
         return questionRepository.save(question);
     }
 
     public void deleteQuestion(Long questionId) {
-        if (!questionRepository.existsById(questionId)) {
-            throw new EntityNotFoundException("Question with ID " + questionId + " not found");
-        }
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new EntityNotFoundException("Question with ID " + questionId + " not found"));
+        Category category = question.getCategory();
+        category.setQuestionCount(category.getQuestionCount() - 1);
+        categoryRepository.save(category);
         questionRepository.deleteById(questionId);
     }
 
@@ -66,5 +72,17 @@ public class QuestionServiceImpl implements QuestionService {
                         question.setImage(minioConfig.getUrl()+"/"+minioConfig.getBucket()+"/"+question.getImage());
                     }
                 }).toList();
+    }
+
+    public void insertQuestions(Map<String, String> questionDescriptions, String categoryName) {
+        Category category = categoryRepository.findByName(categoryName)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+
+        questionDescriptions.forEach((code, description) -> {
+            Question question = new Question();
+            question.setContent(description);
+            question.setCategory(category);
+            questionRepository.save(question);
+        });
     }
 }
