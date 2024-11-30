@@ -3,6 +3,8 @@ package org.bimbimbambam.hacktemplate.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.bimbimbambam.hacktemplate.controller.response.QuestionDto;
+import org.bimbimbambam.hacktemplate.entity.Question;
+import org.bimbimbambam.hacktemplate.entity.QuestionInQueue;
 import org.bimbimbambam.hacktemplate.mapper.QuestionMapper;
 import org.bimbimbambam.hacktemplate.service.QuestionService;
 import org.bimbimbambam.hacktemplate.service.UserService;
@@ -47,14 +49,33 @@ public class QuestionController {
     public QuestionDto addQuestion(String questionContent, String answerLeft, String answerRight, MultipartFile file, Long categoryId) {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
-        jwtUtils.forceAdminRole(token);
-        return questionMapper.toDto(questionService.addQuestion(
-                questionContent,
-                answerLeft,
-                answerRight,
-                file,
-                categoryId
-        ));
+        if (jwtUtils.hasAdminRole(token)) {
+            return questionMapper.toDto(questionService.addQuestion(
+                    questionContent,
+                    answerLeft,
+                    answerRight,
+                    file,
+                    categoryId
+            ));
+        }
+        else {
+            QuestionInQueue questionInQueue = questionService.addQuestionInQueue(
+                    questionContent,
+                    answerLeft,
+                    answerRight,
+                    file,
+                    categoryId
+            );
+
+            Question question = new Question();
+            question.setId(questionInQueue.getId());
+            question.setQuestionContent(questionInQueue.getQuestionContent());
+            question.setImage(questionInQueue.getImage());
+            question.setCategory(questionInQueue.getCategory());
+
+            return questionMapper.toDto(question);
+        }
+        
     }
 
     @DeleteMapping("/delete/{id}")

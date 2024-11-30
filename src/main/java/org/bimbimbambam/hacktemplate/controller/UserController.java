@@ -6,12 +6,15 @@ import org.bimbimbambam.hacktemplate.controller.request.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.UserRegisterReq;
 import org.bimbimbambam.hacktemplate.controller.request.UpdateImageReq;
 import org.bimbimbambam.hacktemplate.controller.response.UserProfileDto;
+import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.mapper.UserMapper;
 import org.bimbimbambam.hacktemplate.service.impl.UserServiceImpl;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,6 +55,11 @@ public class UserController {
     @GetMapping("/{userId}")
     public UserProfileDto getUser(@PathVariable Long userId) {
         return userMapper.toDto(userService.getUser(userId));
+    }
+    
+    @GetMapping("/all")
+    public List<UserProfileDto> all() {
+        return userService.all().stream().map(userMapper::toDto).toList();
     }
 }
 
