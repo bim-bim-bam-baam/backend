@@ -12,6 +12,7 @@ import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.repository.UserRepository;
 import org.bimbimbambam.hacktemplate.service.ChatService;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,8 +53,8 @@ public class ChatController {
         return toDto(charService.sendMessage(chatId, userId, content), userId);
     }
 
-    @PostMapping("/{chatId}/uploadImage")
-    public MessageDto uploadImage(@PathVariable Long chatId, UpdateImageReq updateImageReq) {
+    @PostMapping(value="/{chatId}/uploadImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public MessageDto uploadImage(@PathVariable Long chatId, @ModelAttribute UpdateImageReq updateImageReq) {
         throw new NotImplementedException("aboba");
     }
 
