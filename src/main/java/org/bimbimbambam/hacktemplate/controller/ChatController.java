@@ -2,6 +2,8 @@ package org.bimbimbambam.hacktemplate.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.NotImplementedException;
+import org.bimbimbambam.hacktemplate.controller.request.UpdateImageReq;
 import org.bimbimbambam.hacktemplate.controller.response.ChatDto;
 import org.bimbimbambam.hacktemplate.controller.response.MessageDto;
 import org.bimbimbambam.hacktemplate.entity.Chat;
@@ -48,6 +50,11 @@ public class ChatController {
     public MessageDto sendMessage(@PathVariable Long chatId, @RequestBody String content) {
         Long userId = jwtUtils.extractId(jwtUtils.getJwtToken());
         return toDto(charService.sendMessage(chatId, userId, content), userId);
+    }
+
+    @PostMapping("/{chatId}/uploadImage")
+    public MessageDto uploadImage(@PathVariable Long chatId, UpdateImageReq updateImageReq) {
+        throw new NotImplementedException("aboba");
     }
 
     @GetMapping("/{chatId}/messages")

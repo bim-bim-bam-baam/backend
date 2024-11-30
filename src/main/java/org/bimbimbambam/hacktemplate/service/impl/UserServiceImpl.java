@@ -5,7 +5,7 @@ import org.bimbimbambam.hacktemplate.config.MinioConfig;
 import org.bimbimbambam.hacktemplate.controller.request.ImageRequest;
 import org.bimbimbambam.hacktemplate.controller.request.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.UserRegisterReq;
-import org.bimbimbambam.hacktemplate.controller.request.UserUpdateAvatarReq;
+import org.bimbimbambam.hacktemplate.controller.request.UpdateImageReq;
 import org.bimbimbambam.hacktemplate.entity.*;
 import org.bimbimbambam.hacktemplate.exception.InternalServerErrorException;
 import org.bimbimbambam.hacktemplate.exception.UnauthorizedException;
@@ -20,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -67,7 +66,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateAvatar(Long id, UserUpdateAvatarReq updateAvatarReq) {
+    public void updateAvatar(Long id, UpdateImageReq updateAvatarReq) {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             throw new NotFoundException("User not found");

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.bimbimbambam.hacktemplate.controller.request.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.UserRegisterReq;
-import org.bimbimbambam.hacktemplate.controller.request.UserUpdateAvatarReq;
+import org.bimbimbambam.hacktemplate.controller.request.UpdateImageReq;
 import org.bimbimbambam.hacktemplate.controller.response.UserProfileDto;
 import org.bimbimbambam.hacktemplate.mapper.UserMapper;
 import org.bimbimbambam.hacktemplate.service.impl.UserServiceImpl;
@@ -35,10 +35,10 @@ public class UserController {
     @PostMapping(value = "/updateAvatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SecurityRequirement(name = "bearerAuth")
     public void updateAvatar(
-            @ModelAttribute UserUpdateAvatarReq userUpdateAvatarReq) {
+            @ModelAttribute UpdateImageReq updateImageReq) {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
-        userService.updateAvatar(userId, userUpdateAvatarReq);
+        userService.updateAvatar(userId, updateImageReq);
     }
 
     @GetMapping("/profile")
