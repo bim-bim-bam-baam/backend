@@ -19,4 +19,6 @@ public interface ChatService {
     List<Message> getMessages(Long chatId);
 
     Chat createChatRequest(Long fromUserId, Long toUserId);
+
+    void declineChatRequest(Long chatId, Long userId);
 }

@@ -8,8 +8,6 @@ import org.bimbimbambam.hacktemplate.entity.Category;
 import org.bimbimbambam.hacktemplate.entity.Question;
 import org.bimbimbambam.hacktemplate.repository.CategoryRepository;
 import org.bimbimbambam.hacktemplate.repository.QuestionRepository;
-import org.bimbimbambam.hacktemplate.repository.UserCategoryRepository;
-import org.bimbimbambam.hacktemplate.repository.UserRepository;
 import org.bimbimbambam.hacktemplate.service.ImageService;
 import org.bimbimbambam.hacktemplate.service.QuestionService;
 import org.springframework.stereotype.Service;
@@ -21,13 +19,10 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class QuestionServiceImpl implements QuestionService {
-
     private final QuestionRepository questionRepository;
     private final CategoryRepository categoryRepository; // Assuming this exists.
     private final ImageService imageService;
     private final MinioConfig minioConfig;
-    private final UserCategoryRepository userCategoryRepository;
-    private final UserRepository userRepository;
 
     public Question addQuestion(String content, MultipartFile imageFile, Long categoryId) {
         Category category = categoryRepository.findById(categoryId)

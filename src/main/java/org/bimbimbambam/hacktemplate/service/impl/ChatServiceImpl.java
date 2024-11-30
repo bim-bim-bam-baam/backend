@@ -25,13 +25,16 @@ public class ChatServiceImpl implements ChatService {
     public List<Chat> getSentRequests(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        return chatRepository.findAllByFromUserAndToUserConfirmedFalse(user);
+        return chatRepository.findAllByFromUserAndToUserConfirmedFalse(user)
+                .stream().filter(chat -> !chat.isCanceled()).toList();
+
     }
 
     public List<Chat> getPendingRequests(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        return chatRepository.findAllByToUserAndToUserConfirmedFalse(user);
+        return chatRepository.findAllByToUserAndToUserConfirmedFalse(user)
+                .stream().filter(chat -> !chat.isCanceled()).toList();
     }
 
     @Transactional
@@ -47,11 +50,24 @@ public class ChatServiceImpl implements ChatService {
         chatRepository.save(chat);
     }
 
+    @Transactional
+    public void declineChatRequest(Long chatId, Long userId) {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new NotFoundException("Chat request not found"));
+
+        if (!chat.getToUser().getId().equals(userId)) {
+            throw new ForbiddenException("Access denied: You are not allowed to accept this chat request");
+        }
+        chat.setCanceled(true);
+        chatRepository.save(chat);
+    }
+
     public List<Chat> getActiveChats(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        return chatRepository.findAllByFromUserAndToUserConfirmedTrueOrToUserAndToUserConfirmedTrue(user, user);
+        return chatRepository.findAllByFromUserAndToUserConfirmedTrueOrToUserAndToUserConfirmedTrue(user, user)
+                .stream().filter(chat -> !chat.isCanceled()).toList();
     }
 
     @Transactional

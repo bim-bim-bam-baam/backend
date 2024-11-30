@@ -19,4 +19,7 @@ public class Chat extends AbstractEntity {
 
     @Column(name = "to_user_confirmed", nullable = false)
     boolean toUserConfirmed = false;
+
+    @Column(name = "is_canceled", nullable = false)
+    boolean isCanceled = false;
 }

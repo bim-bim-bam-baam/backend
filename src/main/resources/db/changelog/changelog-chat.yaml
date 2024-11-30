@@ -29,6 +29,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     defaultValueBoolean: false
+              - column:
+                  name: is_canceled
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                    defaultValueBoolean: false
         - addForeignKeyConstraint:
             baseTableName: chat
             baseColumnNames: from_user_id

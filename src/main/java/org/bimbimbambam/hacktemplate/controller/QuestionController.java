@@ -24,7 +24,7 @@ public class QuestionController {
 
     private final QuestionMapper questionMapper;
 
-
+    @Deprecated
     @GetMapping("/getNextQuestion")
     @SecurityRequirement(name = "bearerAuth")
     public QuestionDto getNextQuestionForUser(Long categoryId) {

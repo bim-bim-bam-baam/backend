@@ -71,6 +71,13 @@ public class ChatController {
         charService.acceptChatRequest(chatId, userId);
     }
 
+    @PostMapping("/{chatId}/decline")
+    @SecurityRequirement(name = "bearerAuth")
+    public void declineChatRequest(@PathVariable Long chatId) {
+        Long userId = jwtUtils.extractId(jwtUtils.getJwtToken());
+        charService.declineChatRequest(chatId, userId);
+    }
+
     private ChatDto toDto(Chat chat, Long userId) {
         Long toUserId = chat.getFromUser().getId() + chat.getToUser().getId() - userId;
         User user = userRepository.findById(toUserId).orElseThrow();

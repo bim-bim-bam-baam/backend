@@ -14,5 +14,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     boolean existsByFromUserAndToUser(User fromUser, User toUser);
 
     List<Chat> findAllByFromUserAndToUserConfirmedTrueOrToUserAndToUserConfirmedTrue(User fromUser, User toUser);
+
+    List<Chat> findAllByFromUserOrToUser(User fromUser, User toUser);
 }
 
