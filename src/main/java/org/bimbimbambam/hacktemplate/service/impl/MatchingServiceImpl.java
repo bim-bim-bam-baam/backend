@@ -5,6 +5,7 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
+import org.bimbimbambam.hacktemplate.config.MinioConfig;
 import org.bimbimbambam.hacktemplate.controller.response.UserMatchingDto;
 import org.bimbimbambam.hacktemplate.entity.*;
 import org.bimbimbambam.hacktemplate.exception.NotFoundException;
@@ -28,6 +29,7 @@ public class MatchingServiceImpl implements MatchingService {
     private final CategoryRepository categoryRepository;
     private final ChatRepository chatRepository;
     private final UserCategoryRepository userCategoryRepository;
+    private final MinioConfig minioConfig;
 
     @Override
     public List<UserMatchingDto> getClosest(Long userId, Long categoryId) {
@@ -55,7 +57,7 @@ public class MatchingServiceImpl implements MatchingService {
                 .map(user -> {
                     Map<Long, Long> otherUserAnswers = userAnswers.getOrDefault(user.getId(), new HashMap<>());
                     double similarity = calculateCosineSimilarity(targetUserAnswers, otherUserAnswers, questions);
-                    return new UserMatchingDto(user.getId(), user.getUsername(), user.getAvatar(), Math.round(similarity * 100));
+                    return toUserMatchingDto(user, similarity);
                 })
                 .sorted((a, b) -> Long.compare(b.similarity(), a.similarity()))
                 .collect(Collectors.toList());
@@ -87,20 +89,12 @@ public class MatchingServiceImpl implements MatchingService {
                 .flatMap(chat -> Stream.of(chat.getFromUser(), chat.getToUser()))
                 .distinct().toList();
 
-        List<User> availableUsers = userCategoryRepository.findAllByCategory(category).stream()
-                .map(UserCategory::getUser).toList();
-
         List<User> allUsers = userRepository.findAll().stream()
-                .filter(availableUsers::contains)
-                .filter(user -> !connectedUserIds.contains(user))
-                .filter(user -> !user.equals(currentUser)).toList();
-
+                .filter(user -> !connectedUserIds.contains(user)).toList();
 
         RealMatrix userQuestionMatrix = buildUserQuestionMatrix(allUsers, questions);
 
-
-        RealMatrix reducedUserMatrix = performSVD(userQuestionMatrix, 2);
-
+        RealMatrix reducedUserMatrix = performSVD(userQuestionMatrix, questions.size());
 
         return getSimilarUsers(reducedUserMatrix, currentUser, allUsers);
     }
@@ -149,11 +143,10 @@ public class MatchingServiceImpl implements MatchingService {
                 .limit(10)
                 .map(entry -> {
                     User user = allUsers.stream().filter(u -> u.getId().equals(entry.getKey())).findFirst().orElse(null);
-                    return new UserMatchingDto(user.getId(), user.getUsername(), user.getAvatar(), Math.round(entry.getValue() * 100));
+                    return toUserMatchingDto(user, entry.getValue());
                 })
                 .collect(Collectors.toList());
     }
-
 
     private double calculateCosineSimilarity(RealVector vec1, RealVector vec2) {
         double dotProduct = vec1.dotProduct(vec2);
@@ -177,5 +170,17 @@ public class MatchingServiceImpl implements MatchingService {
         }
 
         return normUser1 == 0 || normUser2 == 0 ? 0.0 : dotProduct / (Math.sqrt(normUser1) * Math.sqrt(normUser2));
+    }
+
+    private UserMatchingDto toUserMatchingDto(User user, double similarity) {
+        if (user.getAvatar() == null)
+            user.setAvatar("unknown.png");
+        user.setAvatar(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + user.getAvatar());
+        return new UserMatchingDto(
+                user.getId(),
+                user.getUsername(),
+                user.getAvatar(),
+                Math.round(similarity * 100)
+        );
     }
 }

@@ -22,6 +22,13 @@ public class UserController {
 
     private final UserMapper userMapper;
 
+    @GetMapping("/isAdmin")
+    @SecurityRequirement(name = "bearerAuth")
+    public String isAdmin() {
+        Jwt token = jwtUtils.getJwtToken();
+        return String.valueOf(jwtUtils.hasAdminRole(token));
+    }
+
     @PostMapping("/register")
     public void registerUser(@RequestBody UserRegisterReq userRegisterReq) {
         userService.registerUser(userRegisterReq);

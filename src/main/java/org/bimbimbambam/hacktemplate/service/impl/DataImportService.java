@@ -53,10 +53,8 @@ public class DataImportService {
 
 
             for (int i = 0; i < headers.length; ++i) {
-                questionService.addQuestion(headers[i], "No", "Yes", null, 1L);
+                questionService.addQuestion(headers[i], "No", "Yes", 1L);
             }
-
-
 
             int cnt = 0;
             for (String[] row : rows) {

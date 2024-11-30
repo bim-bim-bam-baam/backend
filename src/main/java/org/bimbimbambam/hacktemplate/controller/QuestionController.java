@@ -2,15 +2,14 @@ package org.bimbimbambam.hacktemplate.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.bimbimbambam.hacktemplate.controller.request.AddQuestionDto;
 import org.bimbimbambam.hacktemplate.controller.response.QuestionDto;
 import org.bimbimbambam.hacktemplate.mapper.QuestionMapper;
 import org.bimbimbambam.hacktemplate.service.QuestionService;
 import org.bimbimbambam.hacktemplate.service.UserService;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -42,18 +41,17 @@ public class QuestionController {
     }
 
 
-    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/add")
     @SecurityRequirement(name = "bearerAuth")
-    public QuestionDto addQuestion(String questionContent, String answerLeft, String answerRight, MultipartFile file, Long categoryId) {
+    public QuestionDto addQuestion(@RequestBody AddQuestionDto addQuestionDto) {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
         jwtUtils.forceAdminRole(token);
         return questionMapper.toDto(questionService.addQuestion(
-                questionContent,
-                answerLeft,
-                answerRight,
-                file,
-                categoryId
+                addQuestionDto.questionContent(),
+                addQuestionDto.answerLeft(),
+                addQuestionDto.answerRight(),
+                addQuestionDto.categoryId()
         ));
     }
 
