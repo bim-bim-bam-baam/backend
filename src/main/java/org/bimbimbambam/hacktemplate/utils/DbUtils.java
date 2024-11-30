@@ -44,19 +44,6 @@ public class DbUtils {
         return rows;
     }
 
-    public void insertQuestions() {
-        String[] questionLabels = {
-                "EXT1", "EXT2", "EXT3", "AGR1", "AGR2", "AGR3", "CSN1", "EST1", "OPN1" // Add all labels
-        };
-
-        for (String label : questionLabels) {
-            Question question = new Question();
-            question.setContent(label); // Use column name as content
-            question.setCategory(categoryRepository.findByName("Psychology").orElseThrow(() -> new NotFoundException("MDA"))); // Set a category
-            questionRepository.save(question);
-        }
-    }
-
     public String QUESTION_DESCRIPTIONS(String s) {
         var mp = Map.ofEntries(
             Map.entry("EXT1", "I am the life of the party."),

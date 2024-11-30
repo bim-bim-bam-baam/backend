@@ -24,7 +24,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final ImageService imageService;
     private final MinioConfig minioConfig;
 
-    public Question addQuestion(String content, MultipartFile imageFile, Long categoryId) {
+    public Question addQuestion(String questionContent, String answerLeft, String answerRight, MultipartFile imageFile, Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("Category with ID " + categoryId + " not found"));
 
@@ -34,7 +34,9 @@ public class QuestionServiceImpl implements QuestionService {
         }
 
         Question question = new Question();
-        question.setContent(content);
+        question.setQuestionContent(questionContent);
+        question.setAnswerLeft(answerLeft);
+        question.setAnswerRight(answerRight);
         question.setImage(imagePath);
         question.setCategory(category);
 
@@ -71,18 +73,6 @@ public class QuestionServiceImpl implements QuestionService {
                         question.setImage(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + question.getImage());
                     }
                 }).toList();
-    }
-
-    public void insertQuestions(Map<String, String> questionDescriptions, String categoryName) {
-        Category category = categoryRepository.findByName(categoryName)
-                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-
-        questionDescriptions.forEach((code, description) -> {
-            Question question = new Question();
-            question.setContent(description);
-            question.setCategory(category);
-            questionRepository.save(question);
-        });
     }
 
     @Override

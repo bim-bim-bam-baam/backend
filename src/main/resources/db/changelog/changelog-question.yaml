@@ -14,7 +14,17 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: content
+                  name: question_content
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: answer_left
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: answer_right
                   type: VARCHAR(255)
                   constraints:
                     nullable: false

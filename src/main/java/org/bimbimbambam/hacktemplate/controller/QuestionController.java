@@ -44,12 +44,14 @@ public class QuestionController {
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SecurityRequirement(name = "bearerAuth")
-    public QuestionDto addQuestion(String content, MultipartFile file, Long categoryId) {
+    public QuestionDto addQuestion(String questionContent, String answerLeft, String answerRight, MultipartFile file, Long categoryId) {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
         jwtUtils.forceAdminRole(token);
         return questionMapper.toDto(questionService.addQuestion(
-                content,
+                questionContent,
+                answerLeft,
+                answerRight,
                 file,
                 categoryId
         ));
