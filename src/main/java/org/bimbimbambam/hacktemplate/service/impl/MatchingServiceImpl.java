@@ -44,6 +44,7 @@ public class MatchingServiceImpl implements MatchingService {
 
         List<User> connectedUserIds = chatRepository.findAllByFromUserOrToUser(currentUser, currentUser).stream()
                 .flatMap(chat -> Stream.of(chat.getFromUser(), chat.getToUser()))
+                .filter(user -> !user.equals(currentUser))
                 .distinct().toList();
 
         List<User> allUsers = userRepository.findAll().stream()
@@ -100,7 +101,7 @@ public class MatchingServiceImpl implements MatchingService {
 
         SvdUtils.SVDResult svdResult = SvdUtils.computeSVD(userQuestionMatrix);
 
-        double[][] reducedU = reduceMatrix(svdResult.U, 2);
+        double[][] reducedU = reduceMatrix(svdResult.U, questions.size());
 
         int currentUserIndex = allUsers.indexOf(currentUser);
         double[] currentUserVector = reducedU[currentUserIndex];
@@ -128,7 +129,7 @@ public class MatchingServiceImpl implements MatchingService {
 
 
     private double[][] buildUserQuestionMatrix(List<User> users, List<Question> questions) {
-        double[][] matrix = new double[users.size()][questions.size()];
+        double[][] matrix = new double[users.size()][questions.size() + 1];
 
         for (int i = 0; i < users.size(); i++) {
             User user = users.get(i);
@@ -137,6 +138,7 @@ public class MatchingServiceImpl implements MatchingService {
                 Answer answer = answerRepository.findByUserAndQuestion(user, question).orElse(null);
                 matrix[i][j] = (answer != null) ? answer.getAnswer() : 0;
             }
+            matrix[i][questions.size()] = 1;
         }
 
         return matrix;
