@@ -1,6 +1,7 @@
 package org.bimbimbambam.hacktemplate.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.bimbimbambam.hacktemplate.controller.request.ImageRequest;
 import org.bimbimbambam.hacktemplate.controller.request.UpdateImageReq;
 import org.bimbimbambam.hacktemplate.entity.Chat;
 import org.bimbimbambam.hacktemplate.entity.Message;
@@ -11,6 +12,7 @@ import org.bimbimbambam.hacktemplate.repository.ChatRepository;
 import org.bimbimbambam.hacktemplate.repository.MessageRepository;
 import org.bimbimbambam.hacktemplate.repository.UserRepository;
 import org.bimbimbambam.hacktemplate.service.ChatService;
+import org.bimbimbambam.hacktemplate.service.ImageService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRepository chatRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final ImageService imageService;
 
     public List<Chat> getSentRequests(Long userId) {
         User user = userRepository.findById(userId)
@@ -64,9 +67,32 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public Message uploadMessage(Long userId, Long chatId, UpdateImageReq updateImageReq) {
-        return null;
+    @Transactional
+    public Message uploadImage(Long userId, Long chatId, UpdateImageReq updateImageReq) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new NotFoundException("Chat not found"));
+        
+        if (!(chat.getFromUser().getId().equals(userId) || chat.getToUser().getId().equals(userId))) {
+            throw new ForbiddenException("User is not part of the chat");
+        }
+
+        if (!chat.isToUserConfirmed()) {
+            throw new ForbiddenException("Chat is not confirmed");
+        }
+        
+        String imageFilename = imageService.upload(new ImageRequest(updateImageReq.image()));
+        
+        Message message = new Message();
+        message.setChat(chat);
+        message.setAuthor(user);
+        message.setContent(imageFilename);
+        
+        return messageRepository.save(message);
     }
+
 
     public List<Chat> getActiveChats(Long userId) {
         User user = userRepository.findById(userId)

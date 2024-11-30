@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface MatchingService {
     List<UserMatchingDto> getClosest(Long userId, Long categoryId);
+
+    public List<UserMatchingDto> getClosestSvd(Long userId, Long categoryId);
 }

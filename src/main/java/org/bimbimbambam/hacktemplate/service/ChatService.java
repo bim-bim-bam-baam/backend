@@ -23,5 +23,7 @@ public interface ChatService {
 
     void declineChatRequest(Long chatId, Long userId);
 
-    Message uploadMessage(Long userId, Long chatId, UpdateImageReq updateImageReq);
+    Message uploadImage(Long userId, Long chatId, UpdateImageReq updateImageReq);
+
+
 }
