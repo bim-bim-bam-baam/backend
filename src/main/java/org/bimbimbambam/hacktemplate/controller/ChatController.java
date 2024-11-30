@@ -2,6 +2,7 @@ package org.bimbimbambam.hacktemplate.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.bimbimbambam.hacktemplate.config.MinioConfig;
 import org.bimbimbambam.hacktemplate.controller.request.UpdateImageReq;
 import org.bimbimbambam.hacktemplate.controller.response.ChatDto;
 import org.bimbimbambam.hacktemplate.controller.response.MessageDto;
@@ -23,6 +24,7 @@ public class ChatController {
     private final ChatService charService;
     private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
+    private final MinioConfig minioConfig;
 
     @GetMapping("/sent-requests")
     @SecurityRequirement(name = "bearerAuth")
@@ -99,6 +101,9 @@ public class ChatController {
     }
 
     private MessageDto toDto(Message message, Long userId) {
+        if (message.getImage() != null) {
+            message.setImage(minioConfig.getUrl()+"/"+minioConfig.getBucket() + "/" + message.getImage());
+        }
         return new MessageDto(
                 message.getId(),
                 message.getChat().getId(),
