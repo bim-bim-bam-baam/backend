@@ -20,11 +20,19 @@ public class MatchingController {
     private final MatchingService matchingService;
     private final JwtUtils jwtUtils;
 
-    @GetMapping("/{categoryId}")
+    @GetMapping("/cosine/{categoryId}")
     @SecurityRequirement(name = "bearerAuth")
     public List<UserMatchingDto> getClosest(@PathVariable Long categoryId) {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
         return matchingService.getClosest(userId, categoryId);
+    }
+
+    @GetMapping("/svd/{categoryId}")
+    @SecurityRequirement(name = "bearerAuth")
+    public List<UserMatchingDto> getClosestSvd(@PathVariable Long categoryId) {
+        Jwt token = jwtUtils.getJwtToken();
+        Long userId = jwtUtils.extractId(token);
+        return matchingService.getClosestSvd(userId, categoryId);
     }
 }
