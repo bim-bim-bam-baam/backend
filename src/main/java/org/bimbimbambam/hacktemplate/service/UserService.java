@@ -7,6 +7,8 @@ import org.bimbimbambam.hacktemplate.entity.Question;
 import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
 
+import java.util.List;
+
 public interface UserService {
     void registerUser(UserRegisterReq userRegisterReq);
 
@@ -19,4 +21,8 @@ public interface UserService {
     Question getNextQuestion(Long userId, Long cateroryId);
 
     void answerQuestion(Long userId, Long questionId, Long result);
+    
+    List<User> all();
+
+    void setDescription(Long userId, String description);
 }

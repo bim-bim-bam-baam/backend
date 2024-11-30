@@ -1,18 +1,19 @@
 package org.bimbimbambam.hacktemplate.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.math3.linear.MatrixUtils;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
-import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.bimbimbambam.hacktemplate.config.MinioConfig;
 import org.bimbimbambam.hacktemplate.controller.response.UserMatchingDto;
-import org.bimbimbambam.hacktemplate.entity.*;
+import org.bimbimbambam.hacktemplate.entity.Answer;
+import org.bimbimbambam.hacktemplate.entity.Category;
+import org.bimbimbambam.hacktemplate.entity.Question;
+import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.exception.NotFoundException;
 import org.bimbimbambam.hacktemplate.repository.*;
 import org.bimbimbambam.hacktemplate.service.MatchingService;
+import org.bimbimbambam.hacktemplate.utils.SvdUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,8 @@ public class MatchingServiceImpl implements MatchingService {
 
         List<User> allUsers = userRepository.findAll().stream()
                 .filter(user -> !connectedUserIds.contains(user))
-                .filter(user -> !user.equals(currentUser)).toList();
+                //.filter(user -> !user.equals(currentUser))
+                .toList();
 
         Map<Long, Map<Long, Long>> userAnswers = buildUserAnswersMap(allUsers, questions);
         Map<Long, Long> targetUserAnswers = userAnswers.getOrDefault(userId, new HashMap<>());
@@ -75,6 +77,7 @@ public class MatchingServiceImpl implements MatchingService {
         return userAnswersMap;
     }
 
+
     @Override
     public List<UserMatchingDto> getClosestSvd(Long userId, Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
@@ -89,18 +92,42 @@ public class MatchingServiceImpl implements MatchingService {
                 .flatMap(chat -> Stream.of(chat.getFromUser(), chat.getToUser()))
                 .distinct().toList();
 
+
         List<User> allUsers = userRepository.findAll().stream()
                 .filter(user -> !connectedUserIds.contains(user)).toList();
 
-        RealMatrix userQuestionMatrix = buildUserQuestionMatrix(allUsers, questions);
+        double[][] userQuestionMatrix = buildUserQuestionMatrix(allUsers, questions);
 
-        RealMatrix reducedUserMatrix = performSVD(userQuestionMatrix, questions.size());
+        SvdUtils.SVDResult svdResult = SvdUtils.computeSVD(userQuestionMatrix);
 
-        return getSimilarUsers(reducedUserMatrix, currentUser, allUsers);
+        double[][] reducedU = reduceMatrix(svdResult.U, 2);
+
+        int currentUserIndex = allUsers.indexOf(currentUser);
+        double[] currentUserVector = reducedU[currentUserIndex];
+
+        return findSimilarUsers(currentUserIndex, currentUserVector, reducedU, allUsers);
+    }
+
+    private List<UserMatchingDto> findSimilarUsers(int currentUserIndex, double[] currentUserVector, double[][] reducedU, List<User> allUsers) {
+        List<UserMatchingDto> result = new ArrayList<>();
+
+        for (int i = 0; i < reducedU.length; i++) {
+            if (i == currentUserIndex) continue;
+
+            double[] otherUserVector = reducedU[i];
+            double similarity = calculateCosineSimilarity(currentUserVector, otherUserVector);
+
+            User user = allUsers.get(i);
+            result.add(toUserMatchingDto(user, similarity));
+        }
+
+        return result.stream()
+                .sorted((a, b) -> Long.compare(b.similarity(), a.similarity()))
+                .collect(Collectors.toList());
     }
 
 
-    private RealMatrix buildUserQuestionMatrix(List<User> users, List<Question> questions) {
+    private double[][] buildUserQuestionMatrix(List<User> users, List<Question> questions) {
         double[][] matrix = new double[users.size()][questions.size()];
 
         for (int i = 0; i < users.size(); i++) {
@@ -112,49 +139,31 @@ public class MatchingServiceImpl implements MatchingService {
             }
         }
 
-        return MatrixUtils.createRealMatrix(matrix);
+        return matrix;
     }
 
-
-    private RealMatrix performSVD(RealMatrix matrix, int rank) {
-        SingularValueDecomposition svd = new SingularValueDecomposition(matrix);
-
-        RealMatrix U = svd.getU();
-
-        return U.getSubMatrix(0, U.getRowDimension() - 1, 0, rank - 1);
+    private double[][] reduceMatrix(double[][] matrix, int rank) {
+        double[][] reduced = new double[matrix.length][rank];
+        for (int i = 0; i < matrix.length; i++) {
+            System.arraycopy(matrix[i], 0, reduced[i], 0, rank);
+        }
+        return reduced;
     }
 
+    private double calculateCosineSimilarity(double[] vec1, double[] vec2) {
+        double dotProduct = 0.0;
+        double normVec1 = 0.0;
+        double normVec2 = 0.0;
 
-    private List<UserMatchingDto> getSimilarUsers(RealMatrix reducedUserMatrix, User currentUser, List<User> allUsers) {
-        RealVector currentUserVector = reducedUserMatrix.getRowVector(currentUser.getId().intValue());
-
-
-        Map<Long, Double> similarityScores = new HashMap<>();
-        for (int i = 0; i < reducedUserMatrix.getRowDimension(); i++) {
-            if (i != currentUser.getId().intValue()) {
-                RealVector otherUserVector = reducedUserMatrix.getRowVector(i);
-                double similarity = calculateCosineSimilarity(currentUserVector, otherUserVector);
-                similarityScores.put(allUsers.get(i).getId(), similarity);
-            }
+        for (int i = 0; i < vec1.length; i++) {
+            dotProduct += vec1[i] * vec2[i];
+            normVec1 += vec1[i] * vec1[i];
+            normVec2 += vec2[i] * vec2[i];
         }
 
-        return similarityScores.entrySet().stream()
-                .sorted((entry1, entry2) -> Double.compare(entry2.getValue(), entry1.getValue()))
-                .limit(10)
-                .map(entry -> {
-                    User user = allUsers.stream().filter(u -> u.getId().equals(entry.getKey())).findFirst().orElse(null);
-                    return toUserMatchingDto(user, entry.getValue());
-                })
-                .collect(Collectors.toList());
+        return (normVec1 == 0 || normVec2 == 0) ? 0.0 : dotProduct / (Math.sqrt(normVec1) * Math.sqrt(normVec2));
     }
 
-    private double calculateCosineSimilarity(RealVector vec1, RealVector vec2) {
-        double dotProduct = vec1.dotProduct(vec2);
-        double normVec1 = vec1.getNorm();
-        double normVec2 = vec2.getNorm();
-
-        return (normVec1 == 0 || normVec2 == 0) ? 0.0 : dotProduct / (normVec1 * normVec2);
-    }
 
     private double calculateCosineSimilarity(Map<Long, Long> user1Answers, Map<Long, Long> user2Answers, List<Question> questions) {
         double dotProduct = 0.0;
