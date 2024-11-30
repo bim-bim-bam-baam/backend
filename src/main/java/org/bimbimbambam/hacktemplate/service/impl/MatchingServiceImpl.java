@@ -43,11 +43,7 @@ public class MatchingServiceImpl implements MatchingService {
                 .flatMap(chat -> Stream.of(chat.getFromUser(), chat.getToUser()))
                 .distinct().toList();
 
-        List<User> availableUsers = userCategoryRepository.findAllByCategory(category).stream()
-                .map(UserCategory::getUser).toList();
-
         List<User> allUsers = userRepository.findAll().stream()
-                .filter(availableUsers::contains)
                 .filter(user -> !connectedUserIds.contains(user))
                 .filter(user -> !user.equals(currentUser)).toList();
 
@@ -99,17 +95,17 @@ public class MatchingServiceImpl implements MatchingService {
                 .filter(user -> !connectedUserIds.contains(user))
                 .filter(user -> !user.equals(currentUser)).toList();
 
-        
+
         RealMatrix userQuestionMatrix = buildUserQuestionMatrix(allUsers, questions);
 
-        
-        RealMatrix reducedUserMatrix = performSVD(userQuestionMatrix, 2); 
 
-        
+        RealMatrix reducedUserMatrix = performSVD(userQuestionMatrix, 2);
+
+
         return getSimilarUsers(reducedUserMatrix, currentUser, allUsers);
     }
 
-    
+
     private RealMatrix buildUserQuestionMatrix(List<User> users, List<Question> questions) {
         double[][] matrix = new double[users.size()][questions.size()];
 
@@ -118,27 +114,27 @@ public class MatchingServiceImpl implements MatchingService {
             for (int j = 0; j < questions.size(); j++) {
                 Question question = questions.get(j);
                 Answer answer = answerRepository.findByUserAndQuestion(user, question).orElse(null);
-                matrix[i][j] = (answer != null) ? answer.getAnswer() : 0; 
+                matrix[i][j] = (answer != null) ? answer.getAnswer() : 0;
             }
         }
 
         return MatrixUtils.createRealMatrix(matrix);
     }
 
-    
+
     private RealMatrix performSVD(RealMatrix matrix, int rank) {
         SingularValueDecomposition svd = new SingularValueDecomposition(matrix);
 
         RealMatrix U = svd.getU();
-        
+
         return U.getSubMatrix(0, U.getRowDimension() - 1, 0, rank - 1);
     }
 
-    
+
     private List<UserMatchingDto> getSimilarUsers(RealMatrix reducedUserMatrix, User currentUser, List<User> allUsers) {
         RealVector currentUserVector = reducedUserMatrix.getRowVector(currentUser.getId().intValue());
 
-        
+
         Map<Long, Double> similarityScores = new HashMap<>();
         for (int i = 0; i < reducedUserMatrix.getRowDimension(); i++) {
             if (i != currentUser.getId().intValue()) {
@@ -148,10 +144,9 @@ public class MatchingServiceImpl implements MatchingService {
             }
         }
 
-        
         return similarityScores.entrySet().stream()
                 .sorted((entry1, entry2) -> Double.compare(entry2.getValue(), entry1.getValue()))
-                .limit(10) 
+                .limit(10)
                 .map(entry -> {
                     User user = allUsers.stream().filter(u -> u.getId().equals(entry.getKey())).findFirst().orElse(null);
                     return new UserMatchingDto(user.getId(), user.getUsername(), user.getAvatar(), Math.round(entry.getValue() * 100));
@@ -159,7 +154,7 @@ public class MatchingServiceImpl implements MatchingService {
                 .collect(Collectors.toList());
     }
 
-    
+
     private double calculateCosineSimilarity(RealVector vec1, RealVector vec2) {
         double dotProduct = vec1.dotProduct(vec2);
         double normVec1 = vec1.getNorm();
