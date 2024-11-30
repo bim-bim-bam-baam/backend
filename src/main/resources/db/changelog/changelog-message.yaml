@@ -29,6 +29,9 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: image
+                  type: VARCHAR(1000)
+              - column:
                   name: sent_at
                   type: TIMESTAMP
                   defaultValueComputed: CURRENT_TIMESTAMP

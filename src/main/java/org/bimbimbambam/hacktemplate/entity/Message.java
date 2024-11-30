@@ -23,6 +23,9 @@ public class Message extends AbstractEntity {
     @Column(nullable = false, length = 1000)
     private String content;
 
+    @Column
+    private String image;
+
     @Column(nullable = false)
     private LocalDateTime sentAt = LocalDateTime.now();
 }

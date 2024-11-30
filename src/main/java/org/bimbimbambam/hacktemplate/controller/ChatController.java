@@ -2,6 +2,7 @@ package org.bimbimbambam.hacktemplate.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.bimbimbambam.hacktemplate.controller.request.UpdateImageReq;
 import org.bimbimbambam.hacktemplate.controller.response.ChatDto;
 import org.bimbimbambam.hacktemplate.controller.response.MessageDto;
 import org.bimbimbambam.hacktemplate.entity.Chat;
@@ -10,6 +11,7 @@ import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.repository.UserRepository;
 import org.bimbimbambam.hacktemplate.service.ChatService;
 import org.bimbimbambam.hacktemplate.utils.JwtUtils;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,6 +50,12 @@ public class ChatController {
     public MessageDto sendMessage(@PathVariable Long chatId, @RequestBody String content) {
         Long userId = jwtUtils.extractId(jwtUtils.getJwtToken());
         return toDto(charService.sendMessage(chatId, userId, content), userId);
+    }
+
+    @PostMapping(value="/{chatId}/uploadImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public MessageDto uploadImage(@PathVariable Long chatId, @ModelAttribute UpdateImageReq updateImageReq) {
+        Long userId = jwtUtils.extractId(jwtUtils.getJwtToken());
+        return toDto(charService.uploadMessage(userId, chatId, updateImageReq), userId);
     }
 
     @GetMapping("/{chatId}/messages")
@@ -95,7 +103,8 @@ public class ChatController {
                 message.getChat().getId(),
                 message.getAuthor().getId(),
                 message.getAuthor().getId().equals(userId),
-                message.getContent()
+                message.getContent(),
+                message.getImage()
         );
     }
 }

@@ -1,5 +1,6 @@
 package org.bimbimbambam.hacktemplate.service;
 
+import org.bimbimbambam.hacktemplate.controller.request.UpdateImageReq;
 import org.bimbimbambam.hacktemplate.entity.Chat;
 import org.bimbimbambam.hacktemplate.entity.Message;
 
@@ -21,4 +22,6 @@ public interface ChatService {
     Chat createChatRequest(Long fromUserId, Long toUserId);
 
     void declineChatRequest(Long chatId, Long userId);
+
+    Message uploadMessage(Long userId, Long chatId, UpdateImageReq updateImageReq);
 }

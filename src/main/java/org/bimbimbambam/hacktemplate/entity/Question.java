@@ -12,7 +12,7 @@ import java.util.List;
 @Table
 public class Question extends AbstractEntity {
     @Column(nullable = false)
-    private String questionContent;
+    private String content;
 
     @Column(nullable = false)
     private String answerLeft;

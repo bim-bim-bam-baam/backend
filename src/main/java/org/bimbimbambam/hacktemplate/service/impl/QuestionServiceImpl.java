@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +33,7 @@ public class QuestionServiceImpl implements QuestionService {
         }
 
         Question question = new Question();
-        question.setQuestionContent(questionContent);
+        question.setContent(questionContent);
         question.setAnswerLeft(answerLeft);
         question.setAnswerRight(answerRight);
         question.setImage(imagePath);
