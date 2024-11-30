@@ -69,7 +69,7 @@ public class QuestionController {
 
             Question question = new Question();
             question.setId(questionInQueue.getId());
-            question.setQuestionContent(questionInQueue.getQuestionContent());
+            question.setContent(questionInQueue.getContent());
             question.setImage(questionInQueue.getImage());
             question.setCategory(questionInQueue.getCategory());
 

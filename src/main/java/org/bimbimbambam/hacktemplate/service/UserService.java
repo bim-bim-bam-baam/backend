@@ -23,4 +23,6 @@ public interface UserService {
     void answerQuestion(Long userId, Long questionId, Long result);
     
     List<User> all();
+
+    void setDescription(Long userId, String description);
 }

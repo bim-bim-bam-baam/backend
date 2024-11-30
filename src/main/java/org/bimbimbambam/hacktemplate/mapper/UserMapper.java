@@ -1,15 +1,15 @@
 package org.bimbimbambam.hacktemplate.mapper;
 
+import org.bimbimbambam.hacktemplate.controller.response.UserDto;
 import org.bimbimbambam.hacktemplate.entity.User;
-import org.bimbimbambam.hacktemplate.controller.response.UserProfileDto;
-import org.mapstruct.Mapper;
+import org.mapstruct.*;
 
-@Mapper(unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE, componentModel = "spring")
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserMapper {
-    User toEntity(UserProfileDto userProfileDto);
+    User toEntity(UserDto userDto);
 
-    UserProfileDto toDto(User user);
+    UserDto toDto(User user);
 
-    @org.mapstruct.BeanMapping(nullValuePropertyMappingStrategy = org.mapstruct.NullValuePropertyMappingStrategy.IGNORE)
-    User partialUpdate(UserProfileDto userProfileDto, @org.mapstruct.MappingTarget User user);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    User partialUpdate(UserDto userDto, @MappingTarget User user);
 }

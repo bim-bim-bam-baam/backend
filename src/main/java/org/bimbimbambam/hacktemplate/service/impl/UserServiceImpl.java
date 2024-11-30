@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -145,5 +146,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> all() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public void setDescription(Long userId, String description) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User doesn't exist"));
+        user.setDescription(description);
+        userRepository.save(user);
     }
 }

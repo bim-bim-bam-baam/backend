@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: user-init
+      id: question-in-queue-init
       author: yourname
       changes:
         - createTable:
-            tableName: users
+            tableName: question_in_queue
             columns:
               - column:
                   name: id
@@ -14,25 +14,31 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: username
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-                    unique: true
-              - column:
-                  name: password
+                  name: content
                   type: VARCHAR(255)
                   constraints:
                     nullable: false
               - column:
-                  name: description
-                  type: VARCHAR(255)
-              - column:
-                  name: avatar
-                  type: VARCHAR(255)
-              - column:
-                  name: roles
+                  name: answer_left
                   type: VARCHAR(255)
                   constraints:
                     nullable: false
-                    defaultValue: "USER"
+              - column:
+                  name: answer_right
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: image
+                  type: VARCHAR(255)
+              - column:
+                  name: category_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: question_in_queue
+            baseColumnNames: category_id
+            referencedTableName: category
+            referencedColumnNames: id
+            constraintName: fk_question_in_queue_category

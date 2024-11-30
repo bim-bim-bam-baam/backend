@@ -18,6 +18,9 @@ public class User extends AbstractEntity {
     private String password;
 
     @Column
+    private String description;
+
+    @Column
     private String avatar;
 
     @Column(nullable = false)

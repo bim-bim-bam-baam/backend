@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.bimbimbambam.hacktemplate.controller.request.UserLoginReq;
 import org.bimbimbambam.hacktemplate.controller.request.UserRegisterReq;
 import org.bimbimbambam.hacktemplate.controller.request.UpdateImageReq;
-import org.bimbimbambam.hacktemplate.controller.response.UserProfileDto;
-import org.bimbimbambam.hacktemplate.entity.User;
+import org.bimbimbambam.hacktemplate.controller.response.UserDto;
 import org.bimbimbambam.hacktemplate.mapper.UserMapper;
 import org.bimbimbambam.hacktemplate.service.impl.UserServiceImpl;
 import org.bimbimbambam.hacktemplate.utils.Jwt;
@@ -46,20 +45,27 @@ public class UserController {
 
     @GetMapping("/profile")
     @SecurityRequirement(name = "bearerAuth")
-    public UserProfileDto getUserProfile() {
+    public UserDto getUserProfile() {
         Jwt token = jwtUtils.getJwtToken();
         Long userId = jwtUtils.extractId(token);
         return userMapper.toDto(userService.getUser(userId));
     }
 
     @GetMapping("/{userId}")
-    public UserProfileDto getUser(@PathVariable Long userId) {
+    public UserDto getUser(@PathVariable Long userId) {
         return userMapper.toDto(userService.getUser(userId));
     }
     
     @GetMapping("/all")
-    public List<UserProfileDto> all() {
+    public List<UserDto> all() {
         return userService.all().stream().map(userMapper::toDto).toList();
+    }
+
+    @PostMapping("/setDescrioptin")
+    public void setDescription(String description) {
+        Jwt token = jwtUtils.getJwtToken();
+        Long userId = jwtUtils.extractId(token);
+        userService.setDescription(userId, description);
     }
 }
 

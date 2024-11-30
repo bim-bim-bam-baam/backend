@@ -4,15 +4,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Entity
 @Table
 public class QuestionInQueue extends AbstractEntity {
     @Column(nullable = false)
-    private String questionContent;
+    private String content;
 
     @Column(nullable = false)
     private String answerLeft;
@@ -22,9 +20,6 @@ public class QuestionInQueue extends AbstractEntity {
 
     @Column
     private String image;
-
-    @OneToMany(mappedBy = "questionInQueue", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Answer> answers;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)

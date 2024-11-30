@@ -6,7 +6,9 @@ import org.bimbimbambam.hacktemplate.config.MinioConfig;
 import org.bimbimbambam.hacktemplate.controller.request.ImageRequest;
 import org.bimbimbambam.hacktemplate.entity.Category;
 import org.bimbimbambam.hacktemplate.entity.Question;
+import org.bimbimbambam.hacktemplate.entity.QuestionInQueue;
 import org.bimbimbambam.hacktemplate.repository.CategoryRepository;
+import org.bimbimbambam.hacktemplate.repository.QuestionInQueueRepository;
 import org.bimbimbambam.hacktemplate.repository.QuestionRepository;
 import org.bimbimbambam.hacktemplate.service.ImageService;
 import org.bimbimbambam.hacktemplate.service.QuestionService;
@@ -22,6 +24,31 @@ public class QuestionServiceImpl implements QuestionService {
     private final CategoryRepository categoryRepository; // Assuming this exists.
     private final ImageService imageService;
     private final MinioConfig minioConfig;
+
+    private final QuestionInQueueRepository questionInQueueRepository;
+
+    @Override
+    public QuestionInQueue addQuestionInQueue(String questionContent, String answerLeft, String answerRight, MultipartFile imageFile, Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException("Category with ID " + categoryId + " not found"));
+
+        String imagePath = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imagePath = imageService.upload(new ImageRequest(imageFile));
+        }
+
+        QuestionInQueue question = new QuestionInQueue();
+        question.setContent(questionContent);
+        question.setAnswerLeft(answerLeft);
+        question.setAnswerRight(answerRight);
+        question.setImage(imagePath);
+        question.setCategory(category);
+
+        category.setQuestionCount(category.getQuestionCount() + 1);
+        category = categoryRepository.save(category);
+
+        return questionInQueueRepository.save(question);
+    }
 
     public Question addQuestion(String questionContent, String answerLeft, String answerRight, MultipartFile imageFile, Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
