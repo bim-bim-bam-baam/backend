@@ -3,7 +3,6 @@ package org.bimbimbambam.hacktemplate.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.bimbimbambam.hacktemplate.controller.response.QuestionDto;
-import org.bimbimbambam.hacktemplate.entity.Question;
 import org.bimbimbambam.hacktemplate.mapper.QuestionMapper;
 import org.bimbimbambam.hacktemplate.service.QuestionService;
 import org.bimbimbambam.hacktemplate.service.UserService;
@@ -70,8 +69,17 @@ public class QuestionController {
         return questionService.all(categoryId).stream().map(questionMapper::toDto).toList();
     }
 
+    @GetMapping("/remainderByCategory")
+    @SecurityRequirement(name = "bearerAuth")
+    public List<QuestionDto> remainderByCategory(Long categoryId) {
+        Jwt token = jwtUtils.getJwtToken();
+        Long userId = jwtUtils.extractId(token);
+        return questionService.remainder(userId, categoryId).stream().map(questionMapper::toDto).toList();
+    }
+
     @GetMapping("/all")
     public List<QuestionDto> all() {
         return questionService.all().stream().map(questionMapper::toDto).toList();
     }
+
 }
