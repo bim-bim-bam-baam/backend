@@ -1,7 +1,6 @@
 package org.bimbimbambam.hacktemplate.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +10,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table
-public class Question extends AbstractEntity {
+public class QuestionInQueue extends AbstractEntity {
     @Column(nullable = false)
     private String questionContent;
 
@@ -24,7 +23,7 @@ public class Question extends AbstractEntity {
     @Column
     private String image;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "questionInQueue", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers;
 
     @ManyToOne(fetch = FetchType.LAZY)

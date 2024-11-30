@@ -142,4 +142,9 @@ public class UserServiceImpl implements UserService {
         answerRepository.save(answer);
         questionRepository.save(question);
     }
+
+    @Override
+    public List<User> all() {
+        return userRepository.findAll();
+    }
 }
