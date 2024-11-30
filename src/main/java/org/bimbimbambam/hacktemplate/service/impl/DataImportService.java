@@ -9,12 +9,11 @@ import org.bimbimbambam.hacktemplate.entity.User;
 import org.bimbimbambam.hacktemplate.repository.AnswerRepository;
 import org.bimbimbambam.hacktemplate.repository.QuestionRepository;
 import org.bimbimbambam.hacktemplate.repository.UserRepository;
+import org.bimbimbambam.hacktemplate.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 @Service
@@ -24,20 +23,48 @@ public class DataImportService {
     private QuestionRepository questionRepository;
 
     @Autowired
+    private QuestionService questionService;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private AnswerRepository answerRepository;
 
-    public void importData() throws IOException {
-        try (CSVReader reader = new CSVReader(new FileReader("output.csv"))) {
-            String[] headers = reader.readNext(); // Skip headers
-            List<String[]> rows = reader.readAll();
+    private String[] resizeArray(String[] original, int newSize) {
+        String[] resizedArray = new String[newSize];
+        System.arraycopy(original, 0, resizedArray, 0, Math.min(original.length, newSize));
+        return resizedArray;
+    }
 
+
+    public void importData() throws IOException {
+        try (InputStream resourceStream = getClass().getClassLoader().getResourceAsStream("output.csv");
+             InputStreamReader inputStreamReader = new InputStreamReader(resourceStream);
+             CSVReader reader = new CSVReader(inputStreamReader)) {
+
+            String[] headers = reader.readNext()[0].split("\t"); // Skip headers
+            List<String[]> rows = reader.readAll();
+            for (int i = 0; i < rows.size(); ++i) {
+                rows.set(i, resizeArray(rows.get(i)[0].split("\t"), 100)); // Resize each row to 100 elements
+            }
+
+            headers = resizeArray(headers, 100);
+
+
+            for (int i = 0; i < headers.length; ++i) {
+                questionService.addQuestion(headers[i], "No", "Yes", null, 1L);
+            }
+
+
+
+            int cnt = 0;
             for (String[] row : rows) {
                 User user = new User();
-                user.setUsername("user" + row[0]);
+                user.setUsername("user228" + cnt++);
                 user.setPassword("password");
+                System.out.println(user.getUsername());
+                System.out.println(user.getPassword());
                 userRepository.save(user);
 
                 // Process answers
@@ -62,6 +89,7 @@ public class DataImportService {
             throw new RuntimeException(e);
         }
     }
+
 
     private Long parseAnswer(Long originalValue) {
         if (originalValue <= 2) return -1L;

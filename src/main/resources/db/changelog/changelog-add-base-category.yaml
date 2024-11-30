@@ -17,9 +17,15 @@ databaseChangeLog:
             tableName: question
             columns:
               - column:
-                  name: content
+                  name: question_content
                   value: 'Вы любите путешествовать?'
               - column:
+                  name: answer_left
+                  value: "Нет"
+              - column:
+                  name: answer_right
+                  value: "Да"
+              - column:
                   name: category_id
                   value: 1
 
@@ -27,9 +33,15 @@ databaseChangeLog:
             tableName: question
             columns:
               - column:
-                  name: content
+                  name: question_content
                   value: 'Вы предпочитаете вечеринки?'
               - column:
+                  name: answer_left
+                  value: "Нет"
+              - column:
+                  name: answer_right
+                  value: "Да"
+              - column:
                   name: category_id
                   value: 1
 
@@ -37,9 +49,15 @@ databaseChangeLog:
             tableName: question
             columns:
               - column:
-                  name: content
+                  name: question_content
                   value: 'Вы любите домашних животных?'
               - column:
+                  name: answer_left
+                  value: "Нет"
+              - column:
+                  name: answer_right
+                  value: "Да"
+              - column:
                   name: category_id
                   value: 1
 
@@ -47,9 +65,15 @@ databaseChangeLog:
             tableName: question
             columns:
               - column:
-                  name: content
+                  name: question_content
                   value: 'Вам нравится слушать музыку?'
               - column:
+                  name: answer_left
+                  value: "Нет"
+              - column:
+                  name: answer_right
+                  value: "Да"
+              - column:
                   name: category_id
                   value: 1
 
@@ -57,9 +81,15 @@ databaseChangeLog:
             tableName: question
             columns:
               - column:
-                  name: content
+                  name: question_content
                   value: 'Вы часто смотрите фильмы или сериалы?'
               - column:
+                  name: answer_left
+                  value: "Нет"
+              - column:
+                  name: answer_right
+                  value: "Да"
+              - column:
                   name: category_id
                   value: 1
 
@@ -67,19 +97,32 @@ databaseChangeLog:
             tableName: question
             columns:
               - column:
-                  name: content
+                  name: question_content
                   value: 'Вы предпочитаете отдых на пляже?'
               - column:
+                  name: answer_left
+                  value: "Нет"
+              - column:
+                  name: answer_right
+                  value: "Да"
+              - column:
                   name: category_id
                   value: 1
+
 
         - insert:
             tableName: question
             columns:
               - column:
-                  name: content
+                  name: question_content
                   value: 'Вы предпочитаете спокойные вечера дома?'
               - column:
+                  name: answer_left
+                  value: "Нет"
+              - column:
+                  name: answer_right
+                  value: "Да"
+              - column:
                   name: category_id
                   value: 1
 
@@ -87,9 +130,15 @@ databaseChangeLog:
             tableName: question
             columns:
               - column:
-                  name: content
+                  name: question_content
                   value: 'Вам нравится пробовать новые блюда?'
               - column:
+                  name: answer_left
+                  value: "Нет"
+              - column:
+                  name: answer_right
+                  value: "Да"
+              - column:
                   name: category_id
                   value: 1
 
@@ -97,8 +146,14 @@ databaseChangeLog:
             tableName: question
             columns:
               - column:
-                  name: content
+                  name: question_content
                   value: 'Вы верите в любовь с первого взгляда?'
+              - column:
+                  name: answer_left
+                  value: "Нет"
+              - column:
+                  name: answer_right
+                  value: "Да"
               - column:
                   name: category_id
                   value: 1
