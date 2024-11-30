@@ -59,7 +59,7 @@ public class ChatServiceImpl implements ChatService {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new NotFoundException("Chat request not found"));
 
-        if (!chat.getToUser().getId().equals(userId)) {
+        if (!chat.getToUser().getId().equals(userId) && !chat.getFromUser().getId().equals(userId)) {
             throw new ForbiddenException("Access denied: You are not allowed to accept this chat request");
         }
         chat.setCanceled(true);
@@ -71,10 +71,10 @@ public class ChatServiceImpl implements ChatService {
     public Message uploadImage(Long userId, Long chatId, UpdateImageReq updateImageReq) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        
+
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new NotFoundException("Chat not found"));
-        
+
         if (!(chat.getFromUser().getId().equals(userId) || chat.getToUser().getId().equals(userId))) {
             throw new ForbiddenException("User is not part of the chat");
         }
@@ -82,14 +82,15 @@ public class ChatServiceImpl implements ChatService {
         if (!chat.isToUserConfirmed()) {
             throw new ForbiddenException("Chat is not confirmed");
         }
-        
+
         String imageFilename = imageService.upload(new ImageRequest(updateImageReq.image()));
-        
+
         Message message = new Message();
         message.setChat(chat);
         message.setAuthor(user);
-        message.setContent(imageFilename);
-        
+        message.setContent("");
+        message.setImage(imageFilename);
+
         return messageRepository.save(message);
     }
 
