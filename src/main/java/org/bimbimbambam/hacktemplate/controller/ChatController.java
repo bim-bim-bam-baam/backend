@@ -53,9 +53,10 @@ public class ChatController {
     }
 
     @PostMapping(value="/{chatId}/uploadImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @SecurityRequirement(name = "bearerAuth")
     public MessageDto uploadImage(@PathVariable Long chatId, @ModelAttribute UpdateImageReq updateImageReq) {
         Long userId = jwtUtils.extractId(jwtUtils.getJwtToken());
-        return toDto(charService.uploadMessage(userId, chatId, updateImageReq), userId);
+        return toDto(charService.uploadImage(userId, chatId, updateImageReq), userId);
     }
 
     @GetMapping("/{chatId}/messages")
