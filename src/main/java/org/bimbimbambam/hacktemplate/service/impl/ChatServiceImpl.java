@@ -1,6 +1,7 @@
 package org.bimbimbambam.hacktemplate.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.bimbimbambam.hacktemplate.controller.request.UpdateImageReq;
 import org.bimbimbambam.hacktemplate.entity.Chat;
 import org.bimbimbambam.hacktemplate.entity.Message;
 import org.bimbimbambam.hacktemplate.entity.User;
@@ -60,6 +61,11 @@ public class ChatServiceImpl implements ChatService {
         }
         chat.setCanceled(true);
         chatRepository.save(chat);
+    }
+
+    @Override
+    public Message uploadMessage(Long userId, Long chatId, UpdateImageReq updateImageReq) {
+        return null;
     }
 
     public List<Chat> getActiveChats(Long userId) {

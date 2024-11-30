@@ -14,7 +14,7 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: question_content
+                  name: content
                   type: VARCHAR(255)
                   constraints:
                     nullable: false
