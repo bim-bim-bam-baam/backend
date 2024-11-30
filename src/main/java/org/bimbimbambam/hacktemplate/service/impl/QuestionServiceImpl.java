@@ -6,9 +6,6 @@ import org.bimbimbambam.hacktemplate.config.MinioConfig;
 import org.bimbimbambam.hacktemplate.controller.request.ImageRequest;
 import org.bimbimbambam.hacktemplate.entity.Category;
 import org.bimbimbambam.hacktemplate.entity.Question;
-import org.bimbimbambam.hacktemplate.entity.User;
-import org.bimbimbambam.hacktemplate.entity.UserCategory;
-import org.bimbimbambam.hacktemplate.exception.NotFoundException;
 import org.bimbimbambam.hacktemplate.repository.CategoryRepository;
 import org.bimbimbambam.hacktemplate.repository.QuestionRepository;
 import org.bimbimbambam.hacktemplate.repository.UserCategoryRepository;
@@ -95,18 +92,14 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<Question> remainder(Long userId, Long categoryId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
-        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("Category not found"));
-
-        UserCategory userCategory = userCategoryRepository.findByUserAndCategory(user, category)
-                .orElseThrow(() -> new NotFoundException("UserCategory not found"));
-
         return questionRepository.findAllByCategoryId(categoryId).stream()
-                .skip(userCategory.getNextQuestionPos())
+                .filter(question -> question.getAnswers().stream()
+                        .noneMatch(answer -> answer.getUser().getId().equals(userId)))
                 .peek(question -> {
                     if (question.getImage() != null) {
                         question.setImage(minioConfig.getUrl() + "/" + minioConfig.getBucket() + "/" + question.getImage());
                     }
-                }).toList();
+                })
+                .toList();
     }
 }
