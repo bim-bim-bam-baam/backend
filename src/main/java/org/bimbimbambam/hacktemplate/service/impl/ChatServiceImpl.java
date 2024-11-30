@@ -56,7 +56,7 @@ public class ChatServiceImpl implements ChatService {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new NotFoundException("Chat request not found"));
 
-        if (!chat.getToUser().getId().equals(userId)) {
+        if (!chat.getToUser().getId().equals(userId) && !chat.getFromUser().getId().equals(userId)) {
             throw new ForbiddenException("Access denied: You are not allowed to accept this chat request");
         }
         chat.setCanceled(true);
